@@ -66,6 +66,7 @@ func SignIn(signIn common.SignIn) common.TokenResult {
 	tokenResult.IsAdmin = adminUser.Id == userFromDB.Id
 	tokenResult.Username = userFromDB.Username
 	tokenResult.NickName = userFromDB.NickName
+	tokenResult.HasUpdate = userFromDB.HasUpdate
 
 	// 缓存数据
 	tokenCache := common.TokenCache{}
@@ -73,6 +74,7 @@ func SignIn(signIn common.SignIn) common.TokenResult {
 	tokenCache.RefreshToken = refreshToken
 	tokenCache.IsAdmin = adminUser.Id == userFromDB.Id
 	tokenCache.UserId = userFromDB.Id
+	tokenCache.HasUpdate = userFromDB.HasUpdate
 
 	// 缓存token
 	cache2go.Cache(common.AccessTokenCache).Add(tokenResult.AccessToken, AccessTokenExpire, &tokenCache)
@@ -132,6 +134,7 @@ func TokenRefresh(refreshToken string) common.TokenResult {
 	tokenResult.IsAdmin = adminUser.Id == userFromDB.Id
 	tokenResult.Username = userFromDB.Username
 	tokenResult.NickName = userFromDB.NickName
+	tokenResult.HasUpdate = userFromDB.HasUpdate
 
 	// 缓存数据
 	newTokenCache := common.TokenCache{}
@@ -139,6 +142,7 @@ func TokenRefresh(refreshToken string) common.TokenResult {
 	newTokenCache.RefreshToken = refreshToken
 	newTokenCache.IsAdmin = adminUser.Id == userFromDB.Id
 	newTokenCache.UserId = userFromDB.Id
+	tokenCache.HasUpdate = userFromDB.HasUpdate
 
 	// 缓存token
 	cache2go.Cache(common.AccessTokenCache).Add(newTokenCache.AccessToken, AccessTokenExpire, &newTokenCache)

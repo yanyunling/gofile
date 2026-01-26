@@ -13,7 +13,8 @@ require (
 	github.com/wenlng/go-captcha/v2 v2.0.4
 	golang.org/x/crypto v0.47.0
 	golang.org/x/text v0.33.0
-	modernc.org/sqlite v1.44.2
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
+	modernc.org/sqlite v1.44.3
 )
 
 require (

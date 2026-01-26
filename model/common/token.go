@@ -6,8 +6,7 @@ type TokenResult struct {
 	IsAdmin      bool   `json:"isAdmin"`
 	Username     string `json:"username"`
 	NickName     string `json:"nickName"`
-	Icon         string `json:"icon"`
-	Functions    string `json:"functions"`
+	HasUpdate    int    `json:"hasUpdate"`
 }
 
 type TokenCache struct {
@@ -15,6 +14,7 @@ type TokenCache struct {
 	RefreshToken string `json:"refreshToken"`
 	UserId       string `json:"userId"`
 	IsAdmin      bool   `json:"isAdmin"`
+	HasUpdate    int    `json:"hasUpdate"`
 }
 
 type SignIn struct {
