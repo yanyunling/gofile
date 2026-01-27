@@ -28,7 +28,7 @@ func FileList(parentDir, path string) []entity.FileInfo {
 			continue
 		}
 		result = append(result, entity.FileInfo{
-			Path:       util.ReplaceMultipleSlashes(util.PathCompletion(path)),
+			Path:       util.ReplaceMultipleSlashes(path),
 			Name:       entry.Name(),
 			Size:       info.Size(),
 			UpdateTime: info.ModTime().UnixMilli(),

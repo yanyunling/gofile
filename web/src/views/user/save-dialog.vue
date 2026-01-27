@@ -4,8 +4,6 @@
     :title="formData.id ? '修改用户信息' : '新增用户信息'"
     append-to-body
     destroy-on-close
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
     width="500"
     :before-close="beforeClose"
     center
@@ -130,7 +128,6 @@ const setFormData = (user: User) => {
  */
 const beforeClose = () => {
   emit("update:visible", false);
-  formData.value.id = "";
   formData.value.username = "";
   formData.value.nickName = "";
   formData.value.password = "";

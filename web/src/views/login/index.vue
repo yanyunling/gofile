@@ -34,6 +34,7 @@
         <el-button class="input-view" size="large" type="primary" @click="loginClick" :disabled="loading">登录</el-button>
       </div>
       <el-dialog
+        class="captcha-dialog"
         :model-value="captchaVisible"
         append-to-body
         destroy-on-close
@@ -188,7 +189,7 @@ const beforeClose = () => {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .page-login {
   display: flex;
   flex-direction: column;
@@ -211,6 +212,11 @@ const beforeClose = () => {
       width: 100%;
       margin-top: 10px;
     }
+  }
+}
+.captcha-dialog {
+  .go-captcha .gc-drag-block {
+    background-color: #3d5eb9;
   }
 }
 </style>

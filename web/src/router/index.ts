@@ -1,25 +1,20 @@
 import { createRouter, createWebHashHistory } from "vue-router";
+import Layout from "@/views/layout/index.vue";
+import Home from "@/views/home/index.vue";
 
 const routes = [
   {
     path: "/",
     name: "layout",
-    component: () => import("@/views/layout/index.vue"),
+    component: Layout,
     redirect: "/home",
-    children: [
-      { path: "/home", name: "home", component: () => import("@/views/home/index.vue") },
-      { path: "/user", name: "user", component: () => import("@/views/user/index.vue") },
-    ],
+    children: [{ path: "/home", name: "home", component: Home }],
   },
 ];
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
-});
-
-router.beforeEach((to, from, next) => {
-  next();
 });
 
 export default router;

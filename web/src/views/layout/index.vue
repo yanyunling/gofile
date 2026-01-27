@@ -2,11 +2,8 @@
   <div class="page-layout">
     <div class="top-view">
       <div class="left-view">
+        <svg-icon name="logo" customStyle="width: 15px; height: 15px; margin-top: 2px"></svg-icon>
         <div class="title-view">文件服务器</div>
-        <el-menu class="menu-view" :default-active="menuDefaultActive" mode="horizontal" @select="menuSelect">
-          <el-menu-item index="home">主页</el-menu-item>
-          <el-menu-item index="user">用户管理</el-menu-item>
-        </el-menu>
       </div>
       <div class="right-view">
         <el-dropdown>
@@ -16,6 +13,7 @@
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item v-if="!isAdmin" style="user-select: none" @click="updatePasswordDialogVisible = true">修改密码</el-dropdown-item>
+              <el-dropdown-item v-if="isAdmin" style="user-select: none" @click="userDialogVisible = true">用户管理</el-dropdown-item>
               <el-dropdown-item style="user-select: none" @click="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -24,41 +22,24 @@
     </div>
     <router-view class="content-view"></router-view>
     <update-password-dialog v-model:visible="updatePasswordDialogVisible" />
+    <user-dialog v-model:visible="userDialogVisible" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, watch } from "vue";
+import { ref } from "vue";
 import { ElMessageBox } from "element-plus";
 import { useTokenStore } from "@/store/token";
 import { storeToRefs } from "pinia";
 import TokenApi from "@/api/token";
-import updatePasswordDialog from "./update-password-dialog.vue";
-import router from "@/router";
+import updatePasswordDialog from "@/views/user/update-password-dialog.vue";
+import userDialog from "@/views/user/index.vue";
+import svgIcon from "@/components/svg-icon";
 
 const tokenStore = useTokenStore();
 const { isAdmin, nickName } = storeToRefs(tokenStore);
 const updatePasswordDialogVisible = ref(false);
-const menuDefaultActive = ref("");
-
-watch(
-  () => router.currentRoute.value.name,
-  (val) => {
-    menuDefaultActive.value = val?.toString();
-  },
-);
-
-onMounted(() => {
-  menuDefaultActive.value = router.currentRoute.value.name?.toString();
-});
-
-/**
- * 菜单选择
- * @param key
- */
-const menuSelect = (key: string) => {
-  router.push({ name: key });
-};
+const userDialogVisible = ref(false);
 
 /**
  * 点击退出登录
@@ -89,7 +70,7 @@ const logout = () => {
   bottom: 0;
 }
 .top-view {
-  height: 49px;
+  height: 39px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -102,18 +83,13 @@ const logout = () => {
     display: flex;
     align-items: center;
     height: 100%;
-    flex: 1;
-    gap: 20px;
+    gap: 5px;
+    color: #3d5eb9;
     .title-view {
-      font-size: 18px;
+      font-size: 15px;
       font-weight: bold;
       display: flex;
       align-items: center;
-    }
-    .menu-view {
-      height: 100%;
-      flex: 1;
-      border-bottom: none;
     }
   }
   .right-view {
@@ -131,13 +107,13 @@ const logout = () => {
       outline: none;
     }
     .text-view:hover {
-      color: #0094c1;
+      color: #3d5eb9;
     }
   }
 }
 .content-view {
   width: 100%;
-  height: calc(100% - 50px);
+  height: calc(100% - 40px);
   overflow: auto;
   background-color: #fcfcfc;
 }

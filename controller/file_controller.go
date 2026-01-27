@@ -5,6 +5,7 @@ import (
 	"gofile/model/common"
 	"gofile/model/entity"
 	"gofile/service"
+	"os"
 
 	"github.com/kataras/iris/v12"
 )
@@ -37,6 +38,8 @@ func FileListPrivate(ctx iris.Context) {
 		path = fileInfo.Path
 	} else {
 		path = tokenCache.Username + "/" + fileInfo.Path
+		// 确保创建用户名目录
+		os.MkdirAll(common.DataPath+common.PrivateDirName+"/"+tokenCache.Username, 0777)
 	}
 
 	result := service.FileList(common.PrivateDirName, path)

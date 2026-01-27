@@ -4,8 +4,6 @@
     title="重置密码"
     append-to-body
     destroy-on-close
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
     width="400"
     :before-close="beforeClose"
     center
