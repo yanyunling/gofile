@@ -21,7 +21,7 @@ var web embed.FS
 func init() {
 	// 解析命令行参数
 	flag.StringVar(&common.Port, "p", "9300", "监听端口")
-	flag.StringVar(&common.LogPath, "log", "./logs", "日志目录，存放近30天的日志，设置为空则不生成日志文件")
+	flag.StringVar(&common.LogPath, "log", "./logs", "日志目录，存放近30天的日志")
 	flag.StringVar(&common.DataPath, "data", "./data", "数据目录，存放数据库及文件资源")
 	flag.StringVar(&common.AdminPassword, "admin_password", "$2b$10$nHhk5.4ri8Iss0PVaX29BOSqfUSM.i5S7Mb9BBOOgrXPqTUcyNv..", "超级管理员密码")
 	flag.Parse()

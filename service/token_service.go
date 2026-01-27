@@ -74,6 +74,7 @@ func SignIn(signIn common.SignIn) common.TokenResult {
 	tokenCache.RefreshToken = refreshToken
 	tokenCache.IsAdmin = adminUser.Id == userFromDB.Id
 	tokenCache.UserId = userFromDB.Id
+	tokenCache.Username = userFromDB.Username
 	tokenCache.HasUpdate = userFromDB.HasUpdate
 
 	// 缓存token
@@ -142,6 +143,7 @@ func TokenRefresh(refreshToken string) common.TokenResult {
 	newTokenCache.RefreshToken = refreshToken
 	newTokenCache.IsAdmin = adminUser.Id == userFromDB.Id
 	newTokenCache.UserId = userFromDB.Id
+	newTokenCache.Username = userFromDB.Username
 	tokenCache.HasUpdate = userFromDB.HasUpdate
 
 	// 缓存token

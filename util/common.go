@@ -41,6 +41,12 @@ func PathCompletion(path string) string {
 	return path
 }
 
+// 将路径中多个斜杠(/)转为一个
+func ReplaceMultipleSlashes(path string) string {
+	reg := regexp.MustCompile(`/{2,}`)
+	return reg.ReplaceAllString(path, "/")
+}
+
 // 判断文件是否存在，返回error则不确定
 func PathExists(path string) (bool, error) {
 	_, err := os.Stat(path)

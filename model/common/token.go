@@ -14,6 +14,7 @@ type TokenCache struct {
 	RefreshToken string `json:"refreshToken"`
 	UserId       string `json:"userId"`
 	IsAdmin      bool   `json:"isAdmin"`
+	Username     string `json:"username"`
 	HasUpdate    int    `json:"hasUpdate"`
 }
 

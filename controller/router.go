@@ -43,6 +43,20 @@ func InitRouter(app *iris.Application) {
 				user.Post("/delete", UserDelete)
 				user.Post("/reset-password", UserResetPassword)
 			})
+
+			// 文件管理
+			data.PartyFunc("/file", func(file iris.Party) {
+				file.Post("/list", FileListProtected)
+				file.Post("/list/private", FileListPrivate)
+			})
+		})
+
+		// 开放接口
+		api.PartyFunc("/open", func(open iris.Party) {
+			// 文件管理
+			open.PartyFunc("/file", func(file iris.Party) {
+				file.Post("/list", FileListPublic)
+			})
 		})
 	})
 }

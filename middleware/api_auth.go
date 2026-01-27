@@ -53,6 +53,11 @@ func TokenAuth(ctx iris.Context) {
 
 // 获取当前登录用户id
 func CurrentUserId(ctx iris.Context) string {
+	return CurrentUserCache(ctx).UserId
+}
+
+// 获取当前登录用户缓存信息
+func CurrentUserCache(ctx iris.Context) common.TokenCache {
 	token := resolveHeader(ctx, "Bearer")
 	res, err := cache2go.Cache(common.AccessTokenCache).Value(token)
 	if err != nil {
@@ -62,7 +67,7 @@ func CurrentUserId(ctx iris.Context) string {
 	if tokenCache.UserId == "" {
 		panic(common.NewErrorCode(common.HttpAuthFailure, "认证失败"))
 	}
-	return tokenCache.UserId
+	return *tokenCache
 }
 
 // 解析头信息中的认证信息

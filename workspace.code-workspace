@@ -3,6 +3,10 @@
     {
       "name": "ROOT",
       "path": "./"
+    },
+    {
+      "name": "WEB",
+      "path": "./web"
     }
   ],
   "settings": {}
