@@ -63,7 +63,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, Ref, onMounted, nextTick } from "vue";
+import { ref, Ref, watch, nextTick } from "vue";
 import { ElMessage, ElMessageBox, ElTable } from "element-plus";
 import { Search } from "@element-plus/icons-vue";
 import UserApi from "@/api/user";
@@ -94,9 +94,14 @@ const dialogVisible = ref(false);
 const resetPasswordDialogVisible = ref(false);
 const dialogFormData: Ref<User> = ref();
 
-onMounted(() => {
-  queryTableData();
-});
+watch(
+  () => props.visible,
+  (val) => {
+    if (val) {
+      queryTableData();
+    }
+  },
+);
 
 /**
  * 查询表格数据

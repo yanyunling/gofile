@@ -47,16 +47,13 @@ func ReplaceMultipleSlashes(path string) string {
 	return reg.ReplaceAllString(path, "/")
 }
 
-// 判断文件是否存在，返回error则不确定
-func PathExists(path string) (bool, error) {
-	_, err := os.Stat(path)
+// 判断是否为目录，返回error则路径不存在
+func PathIsDir(path string) (bool, error) {
+	fileInfo, err := os.Stat(path)
 	if err == nil {
-		return true, nil
+		return fileInfo.IsDir(), nil
 	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return true, err
+	return false, err
 }
 
 // 获取文件后缀

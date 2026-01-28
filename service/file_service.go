@@ -8,6 +8,7 @@ import (
 	"sort"
 
 	"github.com/kataras/golog"
+	"github.com/kataras/iris/v12"
 )
 
 // 查询文件列表
@@ -44,4 +45,22 @@ func FileList(parentDir, path string) []entity.FileInfo {
 	})
 
 	return result
+}
+
+// 下载文件
+func FileDownload(ctx iris.Context, parentDir, path, fileName string) {
+	// 判断是目录还是文件
+	filePath := common.DataPath + parentDir + "/" + path + "/" + fileName
+	isDir, err := util.PathIsDir(filePath)
+	if err != nil {
+		panic(common.NewErr("文件不存在", err))
+	}
+
+	if isDir {
+		// 目录
+		panic(common.NewError("暂不支持目录下载"))
+	} else {
+		// 文件
+		ctx.SendFile(filePath, fileName)
+	}
 }

@@ -6,7 +6,7 @@
         <div class="title-view">文件服务器</div>
       </div>
       <div class="right-view">
-        <el-dropdown>
+        <el-dropdown v-if="nickName">
           <div class="text-view">
             {{ nickName }}
           </div>
@@ -18,6 +18,7 @@
             </el-dropdown-menu>
           </template>
         </el-dropdown>
+        <div v-else class="text-view" @click="login">登录</div>
       </div>
     </div>
     <router-view class="content-view"></router-view>
@@ -30,6 +31,7 @@
 import { ref } from "vue";
 import { ElMessageBox } from "element-plus";
 import { useTokenStore } from "@/store/token";
+import { useCommonStore } from "@/store/common";
 import { storeToRefs } from "pinia";
 import TokenApi from "@/api/token";
 import updatePasswordDialog from "@/views/user/update-password-dialog.vue";
@@ -40,6 +42,13 @@ const tokenStore = useTokenStore();
 const { isAdmin, nickName } = storeToRefs(tokenStore);
 const updatePasswordDialogVisible = ref(false);
 const userDialogVisible = ref(false);
+
+/**
+ * 点击登录
+ */
+const login = () => {
+  useCommonStore().loginVisible = true;
+};
 
 /**
  * 点击退出登录
@@ -105,6 +114,7 @@ const logout = () => {
       transition: all 0.3s;
       color: #303133;
       outline: none;
+      font-size: 14px;
     }
     .text-view:hover {
       color: #3d5eb9;

@@ -3,8 +3,6 @@
     v-model="loginVisible"
     append-to-body
     destroy-on-close
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
     width="500"
     :before-close="beforeClose"
     center

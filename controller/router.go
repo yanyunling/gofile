@@ -47,7 +47,9 @@ func InitRouter(app *iris.Application) {
 			// 文件管理
 			data.PartyFunc("/file", func(file iris.Party) {
 				file.Post("/list", FileListProtected)
-				file.Post("/list/private", FileListPrivate)
+				file.Post("/download", FileDownloadProtected)
+				file.Post("/private/list", FileListPrivate)
+				file.Post("/private/download", FileDownloadPrivate)
 			})
 		})
 
@@ -56,6 +58,7 @@ func InitRouter(app *iris.Application) {
 			// 文件管理
 			open.PartyFunc("/file", func(file iris.Party) {
 				file.Post("/list", FileListPublic)
+				file.Post("/download", FileDownloadPublic)
 			})
 		})
 	})

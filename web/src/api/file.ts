@@ -36,8 +36,53 @@ class FileApi {
   listPrivate(path: string) {
     return request<FileInfo[]>({
       method: "post",
-      url: "/file/list/private",
+      url: "/file/private/list",
       data: { path: path },
+    });
+  }
+
+  /**
+   * 下载公开文件
+   * @param path
+   * @param name
+   * @returns
+   */
+  downloadPublic(path: string, name: string) {
+    return openRequest<Blob>({
+      method: "post",
+      url: "/file/download",
+      responseType: "blob",
+      data: { path: path, name: name },
+    });
+  }
+
+  /**
+   * 下载保护文件
+   * @param path
+   * @param name
+   * @returns
+   */
+  downloadProtected(path: string, name: string) {
+    return request<Blob>({
+      method: "post",
+      url: "/file/download",
+      responseType: "blob",
+      data: { path: path, name: name },
+    });
+  }
+
+  /**
+   * 下载私有文件
+   * @param path
+   * @param name
+   * @returns
+   */
+  downloadPrivate(path: string, name: string) {
+    return request<Blob>({
+      method: "post",
+      url: "/file/private/download",
+      responseType: "blob",
+      data: { path: path, name: name },
     });
   }
 }
