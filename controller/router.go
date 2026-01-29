@@ -14,11 +14,10 @@ func InitRouter(app *iris.Application) {
 	app.UseRouter(cors.AllowAll())
 
 	app.PartyFunc("/api", func(api iris.Party) {
-		// token相关接口
+		// token接口
 		api.PartyFunc("/token", func(token iris.Party) {
-			// token相关接口认证授权
+			// token接口授权
 			token.Use(middleware.TokenAuth)
-
 			token.Post("/sign-in", SignIn)
 			token.Post("/sign-out", SignOut)
 			token.Post("/refresh", TokenRefresh)
@@ -37,7 +36,6 @@ func InitRouter(app *iris.Application) {
 
 				// 管理员接口授权
 				user.Use(middleware.AdminAuth)
-
 				user.Post("/page", UserPage)
 				user.Post("/save", UserSave)
 				user.Post("/delete", UserDelete)
@@ -46,10 +44,22 @@ func InitRouter(app *iris.Application) {
 
 			// 文件管理
 			data.PartyFunc("/file", func(file iris.Party) {
-				file.Post("/list", FileListProtected)
-				file.Post("/download", FileDownloadProtected)
+				file.Post("/protected/list", FileListProtected)
+				file.Post("/protected/download", FileDownloadProtected)
 				file.Post("/private/list", FileListPrivate)
 				file.Post("/private/download", FileDownloadPrivate)
+				file.Post("/private/folder", FileFolderPrivate)
+				file.Post("/private/upload", FileUploadPrivate)
+				file.Post("/private/delete", FileDeletePrivate)
+
+				// 管理员接口授权
+				file.Use(middleware.AdminAuth)
+				file.Post("/public/folder", FileFolderPublic)
+				file.Post("/public/upload", FileUploadPublic)
+				file.Post("/public/delete", FileDeletePublic)
+				file.Post("/protected/folder", FileFolderProtected)
+				file.Post("/protected/upload", FileUploadProtected)
+				file.Post("/protected/delete", FileDeleteProtected)
 			})
 		})
 
@@ -57,8 +67,8 @@ func InitRouter(app *iris.Application) {
 		api.PartyFunc("/open", func(open iris.Party) {
 			// 文件管理
 			open.PartyFunc("/file", func(file iris.Party) {
-				file.Post("/list", FileListPublic)
-				file.Post("/download", FileDownloadPublic)
+				file.Post("/public/list", FileListPublic)
+				file.Post("/public/download", FileDownloadPublic)
 			})
 		})
 	})

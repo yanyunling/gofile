@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"gofile/model/common"
+	"path/filepath"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/kataras/golog"
@@ -33,7 +34,7 @@ ON "t_user" (
 func InitDB() error {
 	// 开启数据库文件
 	var err error
-	Db, err = sqlx.Connect("sqlite", common.DataPath+"gofile.db")
+	Db, err = sqlx.Connect("sqlite", filepath.Join(common.DataPath, "gofile.db"))
 	if err != nil {
 		golog.Error("开启sqlite数据库文件失败：", err)
 		return err

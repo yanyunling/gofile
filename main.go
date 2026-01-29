@@ -6,7 +6,6 @@ import (
 	"gofile/controller"
 	"gofile/middleware"
 	"gofile/model/common"
-	"gofile/util"
 	"io/fs"
 	"net/http"
 	"time"
@@ -27,7 +26,6 @@ func init() {
 	flag.Parse()
 
 	// 固定配置
-	common.DataPath = util.PathCompletion(common.DataPath)
 	common.BasicTokenKey = "gofile"
 	common.PrivateDirName = "private"
 	common.ProtectedDirName = "protected"

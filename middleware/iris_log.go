@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"gofile/model/common"
-	"gofile/util"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/kataras/golog"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -17,7 +17,7 @@ func InitLog() {
 
 	// 文件输出
 	logger := &lumberjack.Logger{
-		Filename:   util.PathCompletion(common.LogPath) + "app.log",
+		Filename:   filepath.Join(common.LogPath, "app.log"),
 		MaxSize:    100,
 		MaxBackups: 30,
 		MaxAge:     30,

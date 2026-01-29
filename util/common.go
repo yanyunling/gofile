@@ -31,22 +31,6 @@ func StringLength(str string) int {
 	return utf8.RuneCountInString(str)
 }
 
-// 补全路径后的/
-func PathCompletion(path string) string {
-	if path == "" {
-		path = "./"
-	} else if !strings.HasSuffix(path, "/") {
-		path += "/"
-	}
-	return path
-}
-
-// 将路径中多个斜杠(/)转为一个
-func ReplaceMultipleSlashes(path string) string {
-	reg := regexp.MustCompile(`/{2,}`)
-	return reg.ReplaceAllString(path, "/")
-}
-
 // 判断是否为目录，返回error则路径不存在
 func PathIsDir(path string) (bool, error) {
 	fileInfo, err := os.Stat(path)

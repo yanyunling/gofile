@@ -6,6 +6,7 @@ import (
 	"gofile/model/entity"
 	"gofile/service"
 	"os"
+	"path/filepath"
 
 	"github.com/kataras/iris/v12"
 )
@@ -37,9 +38,9 @@ func FileListPrivate(ctx iris.Context) {
 	if tokenCache.IsAdmin {
 		path = fileInfo.Path
 	} else {
-		path = tokenCache.Username + "/" + fileInfo.Path
+		path = filepath.Join(tokenCache.Username, fileInfo.Path)
 		// 确保创建用户名目录
-		os.MkdirAll(common.DataPath+common.PrivateDirName+"/"+tokenCache.Username, 0777)
+		os.MkdirAll(filepath.Join(common.DataPath, common.PrivateDirName, tokenCache.Username), 0755)
 	}
 
 	result := service.FileList(common.PrivateDirName, path)
@@ -71,8 +72,103 @@ func FileDownloadPrivate(ctx iris.Context) {
 	if tokenCache.IsAdmin {
 		path = fileInfo.Path
 	} else {
-		path = tokenCache.Username + "/" + fileInfo.Path
+		path = filepath.Join(tokenCache.Username, fileInfo.Path)
 	}
 
 	service.FileDownload(ctx, common.PrivateDirName, path, fileInfo.Name)
+}
+
+// 创建公开目录
+func FileFolderPublic(ctx iris.Context) {
+	fileInfo := entity.FileInfo{}
+	resolveParam(ctx, &fileInfo)
+	service.FileFolder(common.PublicDirName, fileInfo.Path, fileInfo.Name)
+	ctx.JSON(common.NewSuccess("创建成功"))
+}
+
+// 创建保护目录
+func FileFolderProtected(ctx iris.Context) {
+	fileInfo := entity.FileInfo{}
+	resolveParam(ctx, &fileInfo)
+	service.FileFolder(common.ProtectedDirName, fileInfo.Path, fileInfo.Name)
+	ctx.JSON(common.NewSuccess("创建成功"))
+}
+
+// 创建私有目录
+func FileFolderPrivate(ctx iris.Context) {
+	fileInfo := entity.FileInfo{}
+	resolveParam(ctx, &fileInfo)
+
+	// 管理员可以创建所有目录
+	tokenCache := middleware.CurrentUserCache(ctx)
+	var path string
+	if tokenCache.IsAdmin {
+		path = common.PrivateDirName
+	} else {
+		path = filepath.Join(common.PrivateDirName, tokenCache.Username)
+	}
+
+	service.FileFolder(path, fileInfo.Path, fileInfo.Name)
+	ctx.JSON(common.NewSuccess("创建成功"))
+}
+
+// 上传公开文件
+func FileUploadPublic(ctx iris.Context) {
+	service.FileUpload(ctx, common.PublicDirName)
+	ctx.JSON(common.NewSuccess("上传成功"))
+}
+
+// 上传保护文件
+func FileUploadProtected(ctx iris.Context) {
+	service.FileUpload(ctx, common.ProtectedDirName)
+	ctx.JSON(common.NewSuccess("上传成功"))
+}
+
+// 上传私有文件
+func FileUploadPrivate(ctx iris.Context) {
+	// 管理员可以上传到所有人的目录内
+	tokenCache := middleware.CurrentUserCache(ctx)
+	var path string
+	if tokenCache.IsAdmin {
+		path = common.PrivateDirName
+	} else {
+		path = filepath.Join(common.PrivateDirName, tokenCache.Username)
+	}
+
+	service.FileUpload(ctx, path)
+	ctx.JSON(common.NewSuccess("上传成功"))
+}
+
+// 删除公开文件
+func FileDeletePublic(ctx iris.Context) {
+	fileInfo := entity.FileInfo{}
+	resolveParam(ctx, &fileInfo)
+	service.FileDelete(common.PublicDirName, fileInfo.Path, fileInfo.Name)
+	ctx.JSON(common.NewSuccess("删除成功"))
+}
+
+// 删除保护文件
+func FileDeleteProtected(ctx iris.Context) {
+	fileInfo := entity.FileInfo{}
+	resolveParam(ctx, &fileInfo)
+	service.FileDelete(common.ProtectedDirName, fileInfo.Path, fileInfo.Name)
+	ctx.JSON(common.NewSuccess("删除成功"))
+}
+
+// 删除私有文件
+func FileDeletePrivate(ctx iris.Context) {
+	fileInfo := entity.FileInfo{}
+	resolveParam(ctx, &fileInfo)
+
+	// 管理员可以删除所有人的文件
+	tokenCache := middleware.CurrentUserCache(ctx)
+	var path string
+	if tokenCache.IsAdmin {
+		path = common.PrivateDirName
+	} else {
+		path = filepath.Join(common.PrivateDirName, tokenCache.Username)
+	}
+
+	service.FileDelete(path, fileInfo.Path, fileInfo.Name)
+	ctx.JSON(common.NewSuccess("删除成功"))
 }

@@ -10,7 +10,7 @@ class FileApi {
   listPublic(path: string) {
     return openRequest<FileInfo[]>({
       method: "post",
-      url: "/file/list",
+      url: "/file/public/list",
       data: { path: path },
     });
   }
@@ -23,7 +23,7 @@ class FileApi {
   listProtected(path: string) {
     return request<FileInfo[]>({
       method: "post",
-      url: "/file/list",
+      url: "/file/protected/list",
       data: { path: path },
     });
   }
@@ -50,7 +50,7 @@ class FileApi {
   downloadPublic(path: string, name: string) {
     return openRequest<Blob>({
       method: "post",
-      url: "/file/download",
+      url: "/file/public/download",
       responseType: "blob",
       data: { path: path, name: name },
     });
@@ -65,7 +65,7 @@ class FileApi {
   downloadProtected(path: string, name: string) {
     return request<Blob>({
       method: "post",
-      url: "/file/download",
+      url: "/file/protected/download",
       responseType: "blob",
       data: { path: path, name: name },
     });
@@ -82,6 +82,141 @@ class FileApi {
       method: "post",
       url: "/file/private/download",
       responseType: "blob",
+      data: { path: path, name: name },
+    });
+  }
+
+  /**
+   * 创建公开目录
+   * @param path
+   * @param name
+   * @returns
+   */
+  folderPublic(path: string, name: string) {
+    return request<null>({
+      method: "post",
+      url: "/file/public/folder",
+      data: { path: path, name: name },
+    });
+  }
+
+  /**
+   * 创建保护目录
+   * @param path
+   * @param name
+   * @returns
+   */
+  folderProtected(path: string, name: string) {
+    return request<null>({
+      method: "post",
+      url: "/file/protected/folder",
+      data: { path: path, name: name },
+    });
+  }
+
+  /**
+   * 创建私有目录
+   * @param path
+   * @param name
+   * @returns
+   */
+  folderPrivate(path: string, name: string) {
+    return request<null>({
+      method: "post",
+      url: "/file/private/folder",
+      data: { path: path, name: name },
+    });
+  }
+
+  /**
+   * 上传公开文件
+   * @param path
+   * @param file
+   * @returns
+   */
+  uploadPublic(path: string, file: File) {
+    const formData = new FormData();
+    formData.append("path", path);
+    formData.append("file", file);
+    return request<null>({
+      method: "post",
+      url: "/file/public/upload",
+      data: formData,
+    });
+  }
+
+  /**
+   * 上传保护文件
+   * @param path
+   * @param file
+   * @returns
+   */
+  uploadProtected(path: string, file: File) {
+    const formData = new FormData();
+    formData.append("path", path);
+    formData.append("file", file);
+    return request<null>({
+      method: "post",
+      url: "/file/protected/upload",
+      data: formData,
+    });
+  }
+
+  /**
+   * 上传私有文件
+   * @param path
+   * @param file
+   * @returns
+   */
+  uploadPrivate(path: string, file: File) {
+    const formData = new FormData();
+    formData.append("path", path);
+    formData.append("file", file);
+    return request<null>({
+      method: "post",
+      url: "/file/private/upload",
+      data: formData,
+    });
+  }
+
+  /**
+   * 删除公开文件
+   * @param path
+   * @param name
+   * @returns
+   */
+  deletePublic(path: string, name: string) {
+    return request<null>({
+      method: "post",
+      url: "/file/public/delete",
+      data: { path: path, name: name },
+    });
+  }
+
+  /**
+   * 删除保护文件
+   * @param path
+   * @param name
+   * @returns
+   */
+  deleteProtected(path: string, name: string) {
+    return request<null>({
+      method: "post",
+      url: "/file/protected/delete",
+      data: { path: path, name: name },
+    });
+  }
+
+  /**
+   * 删除私有文件
+   * @param path
+   * @param name
+   * @returns
+   */
+  deletePrivate(path: string, name: string) {
+    return request<null>({
+      method: "post",
+      url: "/file/private/delete",
       data: { path: path, name: name },
     });
   }
