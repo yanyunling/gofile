@@ -17,24 +17,17 @@
     <div class="right-view">
       <div class="right-inner">
         <div class="path-view">
-          <el-breadcrumb separator="/">
-            <el-breadcrumb-item>
-              <div>根目录</div>
-            </el-breadcrumb-item>
-            <el-breadcrumb-item>promotion list</el-breadcrumb-item>
-            <el-breadcrumb-item>promotion detail</el-breadcrumb-item>
-          </el-breadcrumb>
+          <span class="path-text" @click="pathClick(-1)">根目录</span>
+          <span class="split-text">/</span>
+          <template v-for="(path, index) in pathList" :key="index">
+            <span class="path-text" @click="pathClick(index)">{{ path }}</span>
+            <span class="split-text">/</span>
+          </template>
         </div>
-        <el-table class="table-view" ref="tableRef" :data="fileList" height="calc(100% - 29px)" size="small" stripe>
+        <el-table class="table-view" ref="tableRef" :data="fileList" height="calc(100% - 49px)" size="small">
           <el-table-column prop="" label="序号" align="center" width="60">
             <template #default="scope">
               {{ scope.$index + 1 }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="isDir" label="类型" align="center" width="80">
-            <template #default="scope">
-              <el-tag v-if="scope.row.isDir" type="primary" disable-transitions>目录</el-tag>
-              <el-tag v-else type="success" disable-transitions>文件</el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="name" label="文件名" align="center">
@@ -43,9 +36,15 @@
               <span v-else>{{ scope.row.name }}</span>
             </template>
           </el-table-column>
+          <el-table-column prop="isDir" label="类型" align="center" width="80">
+            <template #default="scope">
+              <el-tag v-if="scope.row.isDir" type="primary" disable-transitions>目录</el-tag>
+              <el-tag v-else type="success" disable-transitions>文件</el-tag>
+            </template>
+          </el-table-column>
           <el-table-column prop="size" label="文件大小" align="center" width="150">
             <template #default="scope">
-              {{ Upload.formatFileSize(scope.row.size) }}
+              {{ scope.row.isDir ? "--" : Upload.formatFileSize(scope.row.size) }}
             </template>
           </el-table-column>
           <el-table-column prop="updateTime" label="更新时间" align="center" width="150">
@@ -98,6 +97,19 @@ onMounted(() => {
 const changeType = (menu: string) => {
   currentMenu.value = menu;
   pathList.value = [];
+  queryFileList();
+};
+
+/**
+ * 点击路径
+ * @param index -1代表根路径
+ */
+const pathClick = (index: number) => {
+  if (index === -1) {
+    pathList.value = [];
+  } else {
+    pathList.value = pathList.value.slice(0, index + 1);
+  }
   queryFileList();
 };
 
@@ -255,9 +267,21 @@ const deleteClick = (row: FileInfo) => {
       border-radius: 10px;
       overflow: hidden;
       .path-view {
-        height: 30px;
+        height: 50px;
         display: flex;
         align-items: center;
+        font-size: 14px;
+        color: #3d5eb9;
+        user-select: none;
+        gap: 5px;
+        padding: 0 15px;
+        border-bottom: 1px #eee solid;
+        .path-text {
+          cursor: pointer;
+        }
+        .split-text {
+          color: #ccc;
+        }
       }
       .table-view {
         .folder-name {
