@@ -12,9 +12,6 @@
       <el-form-item label="用户名" prop="username">
         <el-input v-model="formData.username" readonly></el-input>
       </el-form-item>
-      <el-form-item label="昵称" prop="nickName">
-        <el-input v-model="formData.nickName" readonly></el-input>
-      </el-form-item>
       <el-form-item label="新密码" prop="password">
         <el-input v-model.trim="formData.password" placeholder="请填写新密码"></el-input>
       </el-form-item>
@@ -49,7 +46,6 @@ const formLoading = ref(false);
 const formData: Ref<User> = ref({
   id: "",
   username: "",
-  nickName: "",
   password: "",
   enable: 1,
   hasUpdate: 0,
@@ -96,7 +92,6 @@ const saveClick = () => {
 const setFormData = (user: User) => {
   formData.value.id = user.id;
   formData.value.username = user.username;
-  formData.value.nickName = user.nickName;
   formData.value.enable = user.enable;
   formData.value.hasUpdate = user.hasUpdate;
 };
@@ -108,7 +103,6 @@ const beforeClose = () => {
   emit("update:visible", false);
   formData.value.id = "";
   formData.value.username = "";
-  formData.value.nickName = "";
   formData.value.password = "";
   formData.value.enable = 1;
   formData.value.hasUpdate = 0;

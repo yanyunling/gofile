@@ -6,9 +6,9 @@
         <div class="title-view">文件服务器</div>
       </div>
       <div class="right-view">
-        <el-dropdown v-if="nickName">
+        <el-dropdown v-if="username">
           <div class="text-view">
-            {{ nickName }}
+            {{ username }}
           </div>
           <template #dropdown>
             <el-dropdown-menu>
@@ -39,7 +39,7 @@ import userDialog from "@/views/user/index.vue";
 import svgIcon from "@/components/svg-icon";
 
 const tokenStore = useTokenStore();
-const { isAdmin, nickName } = storeToRefs(tokenStore);
+const { isAdmin, username } = storeToRefs(tokenStore);
 const updatePasswordDialogVisible = ref(false);
 const userDialogVisible = ref(false);
 

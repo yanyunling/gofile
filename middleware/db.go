@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS t_user
 (
 	id varchar(36) PRIMARY KEY NOT NULL,
 	username text NOT NULL,
-	nick_name text NOT NULL,
 	password text NOT NULL,
 	enable int NOT NULL,
 	has_update int NOT NULL
@@ -46,12 +45,13 @@ func InitDB() error {
 		golog.Error("VACUUM执行失败：", err)
 	}
 
+	// 只有用户管理操作数据库，暂时无需开启WAL模式
 	// 开启WAL模式
-	_, err = Db.Exec("PRAGMA journal_mode=WAL;")
-	if err != nil {
-		golog.Error("开启sqlite WAL模式失败：", err)
-		return err
-	}
+	// _, err = Db.Exec("PRAGMA journal_mode=WAL;")
+	// if err != nil {
+	// 	golog.Error("开启sqlite WAL模式失败：", err)
+	// 	return err
+	// }
 
 	golog.Info("已连接sqlite")
 

@@ -22,7 +22,6 @@
           </template>
         </el-table-column>
         <el-table-column prop="username" label="用户名" align="center" />
-        <el-table-column prop="nickName" label="昵称" align="center" />
         <el-table-column prop="enable" label="状态" align="center">
           <template #default="scope">
             <el-tag v-if="scope.row.enable === 1" type="success" disable-transitions>启用</el-tag>
@@ -128,7 +127,6 @@ const addClick = () => {
   dialogFormData.value = {
     id: "",
     username: "",
-    nickName: "",
     password: "",
     enable: 1,
     hasUpdate: 0,

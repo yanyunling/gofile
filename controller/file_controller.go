@@ -105,6 +105,10 @@ func FileFolderPrivate(ctx iris.Context) {
 	if tokenCache.IsAdmin {
 		path = common.PrivateDirName
 	} else {
+		// 判断用户是否有更新权限
+		if tokenCache.HasUpdate != 1 {
+			panic(common.NewError("无权限操作"))
+		}
 		path = filepath.Join(common.PrivateDirName, tokenCache.Username)
 	}
 
@@ -132,6 +136,10 @@ func FileUploadPrivate(ctx iris.Context) {
 	if tokenCache.IsAdmin {
 		path = common.PrivateDirName
 	} else {
+		// 判断用户是否有更新权限
+		if tokenCache.HasUpdate != 1 {
+			panic(common.NewError("无权限操作"))
+		}
 		path = filepath.Join(common.PrivateDirName, tokenCache.Username)
 	}
 
@@ -166,6 +174,10 @@ func FileDeletePrivate(ctx iris.Context) {
 	if tokenCache.IsAdmin {
 		path = common.PrivateDirName
 	} else {
+		// 判断用户是否有更新权限
+		if tokenCache.HasUpdate != 1 {
+			panic(common.NewError("无权限操作"))
+		}
 		path = filepath.Join(common.PrivateDirName, tokenCache.Username)
 	}
 

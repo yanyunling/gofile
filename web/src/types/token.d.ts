@@ -3,7 +3,6 @@ interface TokenResult {
   refreshToken: string;
   isAdmin: boolean;
   username: string;
-  nickName: string;
   hasUpdate: number;
 }
 

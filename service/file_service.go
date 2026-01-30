@@ -113,6 +113,7 @@ func FileUpload(ctx iris.Context, parentDir string) {
 	// 复制文件
 	_, err = io.Copy(out, file)
 	if err != nil {
+		os.RemoveAll(filePath)
 		panic(common.NewErr("文件保存失败", err))
 	}
 }

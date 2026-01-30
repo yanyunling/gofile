@@ -5,7 +5,6 @@ type TokenResult struct {
 	RefreshToken string `json:"refreshToken"`
 	IsAdmin      bool   `json:"isAdmin"`
 	Username     string `json:"username"`
-	NickName     string `json:"nickName"`
 	HasUpdate    int    `json:"hasUpdate"`
 }
 

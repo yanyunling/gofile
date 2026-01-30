@@ -65,7 +65,6 @@ func SignIn(signIn common.SignIn) common.TokenResult {
 	tokenResult.RefreshToken = refreshToken
 	tokenResult.IsAdmin = adminUser.Id == userFromDB.Id
 	tokenResult.Username = userFromDB.Username
-	tokenResult.NickName = userFromDB.NickName
 	tokenResult.HasUpdate = userFromDB.HasUpdate
 
 	// 缓存数据
@@ -134,7 +133,6 @@ func TokenRefresh(refreshToken string) common.TokenResult {
 	tokenResult.RefreshToken = refreshToken
 	tokenResult.IsAdmin = adminUser.Id == userFromDB.Id
 	tokenResult.Username = userFromDB.Username
-	tokenResult.NickName = userFromDB.NickName
 	tokenResult.HasUpdate = userFromDB.HasUpdate
 
 	// 缓存数据

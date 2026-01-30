@@ -12,9 +12,6 @@
       <el-form-item label="用户名" prop="username">
         <el-input v-model.trim="formData.username" placeholder="请填写用户名" :readonly="formData.id !== ''"></el-input>
       </el-form-item>
-      <el-form-item label="昵称" prop="nickName">
-        <el-input v-model.trim="formData.nickName" placeholder="请填写昵称"></el-input>
-      </el-form-item>
       <el-form-item label="密码" prop="password" v-if="!formData.id">
         <el-input v-model.trim="formData.password" placeholder="请填写密码"></el-input>
       </el-form-item>
@@ -61,7 +58,6 @@ const formLoading = ref(false);
 const formData: Ref<User> = ref({
   id: "",
   username: "",
-  nickName: "",
   password: "",
   enable: 1,
   hasUpdate: 0,
@@ -69,12 +65,7 @@ const formData: Ref<User> = ref({
 const rules = {
   username: [
     { required: true, message: "请填写用户名", trigger: "blur" },
-    { max: 30, message: "用户名最多30个字符", trigger: "blur" },
-    { pattern: /^[A-Za-z0-9]+$/, message: "请填写英文字母或数字", trigger: "blur" },
-  ],
-  nickName: [
-    { required: true, message: "请填写昵称", trigger: "blur" },
-    { max: 30, message: "昵称最多30个字符", trigger: "blur" },
+    { pattern: /^[a-zA-Z0-9_\-\u4e00-\u9fa5]{1,20}$/, message: "只允许20个字符以内的数字、英文、汉字、中划线、下划线", trigger: "blur" },
   ],
   password: [
     { required: true, message: "请填写密码", trigger: "blur" },
@@ -118,7 +109,6 @@ const saveClick = () => {
 const setFormData = (user: User) => {
   formData.value.id = user.id;
   formData.value.username = user.username;
-  formData.value.nickName = user.nickName;
   formData.value.enable = user.enable;
   formData.value.hasUpdate = user.hasUpdate;
 };
@@ -129,7 +119,6 @@ const setFormData = (user: User) => {
 const beforeClose = () => {
   emit("update:visible", false);
   formData.value.username = "";
-  formData.value.nickName = "";
   formData.value.password = "";
   formData.value.enable = 1;
   formData.value.hasUpdate = 0;

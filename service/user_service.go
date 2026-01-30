@@ -8,7 +8,6 @@ import (
 	"gofile/util"
 	"regexp"
 	"strings"
-	"unicode/utf8"
 )
 
 // 分页查询用户记录
@@ -39,15 +38,9 @@ func UserSave(user entity.User) {
 	defer tx.Rollback()
 
 	// 数据校验
-	if utf8.RuneCountInString(user.Username) > 30 || utf8.RuneCountInString(user.Username) < 1 {
-		panic(common.NewError("用户名：长度不可超过30个字符"))
-	}
-	if utf8.RuneCountInString(user.NickName) > 30 || utf8.RuneCountInString(user.NickName) < 1 {
-		panic(common.NewError("昵称：长度不可超过30个字符"))
-	}
-	regex := regexp.MustCompile(`[a-zA-Z0-9]`)
+	regex := regexp.MustCompile(`^[\w\-\p{Han}]{1,20}$`)
 	if !regex.MatchString(user.Username) {
-		panic(common.NewError("用户名：请填写英文字母或数字"))
+		panic(common.NewError("用户名：只允许20个字符以内的数字、英文、汉字、中划线、下划线"))
 	}
 
 	// 更新用户

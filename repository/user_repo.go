@@ -66,7 +66,7 @@ func UserPage(db *sqlx.DB, page common.Page, condition string) ([]entity.User, i
 		sqlCompletion.EqOr("has_update", 0)
 	}
 
-	sqlCompletion.LikeOr([]string{"username", "nick_name"}, condition)
+	sqlCompletion.LikeOr([]string{"username"}, condition)
 	sqlCompletion.Order("username", true)
 	sqlCompletion.Limit(page.Current, page.Size)
 
@@ -98,14 +98,12 @@ func UserAdd(tx *sqlx.Tx, user entity.User) error {
 	sql := `insert into t_user 
 	(id,
 	username,
-	nick_name,
 	password,
 	enable,
 	has_update)
 	values 
 	(:id,
 	:username,
-	:nick_name,
 	:password,
 	:enable,
 	:has_update)`
@@ -116,7 +114,6 @@ func UserAdd(tx *sqlx.Tx, user entity.User) error {
 // 修改用户记录
 func UserUpdate(tx *sqlx.Tx, user entity.User) error {
 	sql := `update t_user set 
-	nick_name=:nick_name,
 	enable=:enable,
 	has_update=:has_update
 	where id=:id`
