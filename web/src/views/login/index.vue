@@ -205,7 +205,7 @@ const beforeClose = () => {
     flex-direction: column;
     align-items: flex-end;
     background: rgba(255, 255, 255, 0.2);
-    padding: 30px 20px 60px 20px;
+    padding: 30px 20px 50px 20px;
     .input-view {
       width: 100%;
       margin-top: 10px;

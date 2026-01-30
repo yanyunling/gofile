@@ -6,7 +6,7 @@
         <div class="title-view">文件服务器</div>
       </div>
       <div class="right-view">
-        <el-dropdown v-if="username">
+        <el-dropdown v-if="accessToken">
           <div class="text-view">
             {{ username }}
           </div>
@@ -39,7 +39,7 @@ import userDialog from "@/views/user/index.vue";
 import svgIcon from "@/components/svg-icon";
 
 const tokenStore = useTokenStore();
-const { isAdmin, username } = storeToRefs(tokenStore);
+const { isAdmin, accessToken, username } = storeToRefs(tokenStore);
 const updatePasswordDialogVisible = ref(false);
 const userDialogVisible = ref(false);
 
@@ -88,15 +88,15 @@ const logout = () => {
   padding: 0 2%;
   white-space: nowrap;
   gap: 20px;
+  background: #3d5eb9;
   .left-view {
     display: flex;
     align-items: center;
     height: 100%;
     gap: 5px;
-    color: #3d5eb9;
+    color: #fff;
     .title-view {
       font-size: 15px;
-      font-weight: bold;
       display: flex;
       align-items: center;
     }
@@ -112,12 +112,12 @@ const logout = () => {
       justify-content: center;
       cursor: pointer;
       transition: all 0.3s;
-      color: #303133;
+      color: #fff;
       outline: none;
       font-size: 14px;
     }
     .text-view:hover {
-      color: #3d5eb9;
+      color: #eee;
     }
   }
 }
