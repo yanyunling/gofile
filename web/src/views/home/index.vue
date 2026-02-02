@@ -17,10 +17,10 @@
     <div class="right-view">
       <div class="right-inner">
         <div class="path-view">
-          <span class="path-text" @click="pathClick(-1)">根目录</span>
+          <span class="path-text" :class="{ active: pathList.length === 0 }" @click="pathClick(-1)">根目录</span>
           <span class="split-text">/</span>
           <template v-for="(path, index) in pathList" :key="index">
-            <span class="path-text" @click="pathClick(index)">{{ path }}</span>
+            <span class="path-text" :class="{ active: pathList.length === index + 1 }" @click="pathClick(index)">{{ path }}</span>
             <span class="split-text">/</span>
           </template>
         </div>
@@ -52,14 +52,17 @@
               {{ formatTime(scope.row.updateTime) }}
             </template>
           </el-table-column>
-          <el-table-column prop="" label="" align="center" width="180">
+          <el-table-column prop="操作" label="" align="center" width="180">
             <template #header>
-              <el-button type="primary" link size="small" @click="uploadClick">上传</el-button>
-              <el-button type="primary" link size="small" @click="createFolderClick">创建目录</el-button>
+              <template v-if="updateAuth()">
+                <el-button type="primary" link size="small" @click="uploadClick">上传</el-button>
+                <el-button type="primary" link size="small" @click="createFolderClick">创建目录</el-button>
+              </template>
+              <template v-else>操作</template>
             </template>
             <template #default="scope">
               <el-button v-if="!scope.row.isDir" type="primary" link size="small" @click="downloadClick(scope.row)">下载</el-button>
-              <el-button type="danger" link size="small" @click="deleteClick(scope.row)">删除</el-button>
+              <el-button v-if="updateAuth()" type="danger" link size="small" @click="deleteClick(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -80,7 +83,7 @@ import { FolderChecked, Lock, User } from "@element-plus/icons-vue";
 import { formatTime } from "@/utils";
 
 const tokenStore = useTokenStore();
-const { isAdmin, accessToken } = storeToRefs(tokenStore);
+const { isAdmin, accessToken, hasUpdate } = storeToRefs(tokenStore);
 const currentMenu = ref("public");
 const loading = ref(false);
 const fileList: Ref<FileInfo[]> = ref([]);
@@ -89,6 +92,19 @@ const pathList: Ref<string[]> = ref([]);
 onMounted(() => {
   queryFileList();
 });
+
+/**
+ * 判断是否有更新权限
+ */
+const updateAuth = () => {
+  if (isAdmin.value) {
+    return true;
+  }
+  if (currentMenu.value === "private" && hasUpdate.value) {
+    return true;
+  }
+  return false;
+};
 
 /**
  * 文件分类变更
@@ -126,6 +142,7 @@ const folderClick = (row: FileInfo) => {
  * 查询文件列表
  */
 const queryFileList = () => {
+  fileList.value = [];
   const fileFunc =
     currentMenu.value === "public" ? FileApi.listPublic : currentMenu.value === "protected" ? FileApi.listProtected : FileApi.listPrivate;
   loading.value = true;
@@ -278,6 +295,9 @@ const deleteClick = (row: FileInfo) => {
         border-bottom: 1px #eee solid;
         .path-text {
           cursor: pointer;
+        }
+        .path-text.active {
+          color: #aaa;
         }
         .split-text {
           color: #ccc;

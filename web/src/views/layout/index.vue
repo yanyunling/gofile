@@ -21,7 +21,7 @@
         <div v-else class="text-view" @click="login">登录</div>
       </div>
     </div>
-    <router-view class="content-view"></router-view>
+    <home class="content-view" />
     <update-password-dialog v-model:visible="updatePasswordDialogVisible" />
     <user-dialog v-model:visible="userDialogVisible" />
   </div>
@@ -37,6 +37,7 @@ import TokenApi from "@/api/token";
 import updatePasswordDialog from "@/views/user/update-password-dialog.vue";
 import userDialog from "@/views/user/index.vue";
 import svgIcon from "@/components/svg-icon";
+import home from "@/views/home/index.vue";
 
 const tokenStore = useTokenStore();
 const { isAdmin, accessToken, username } = storeToRefs(tokenStore);
@@ -124,7 +125,6 @@ const logout = () => {
 .content-view {
   width: 100%;
   height: calc(100% - 40px);
-  overflow: auto;
   background-color: #fcfcfc;
 }
 </style>
