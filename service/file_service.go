@@ -16,6 +16,7 @@ import (
 // 查询文件列表
 func FileList(parentDir, path string) []entity.FileInfo {
 	// 读取当前目录
+	path = filepath.Clean("/" + path)
 	dirPath := filepath.Join(common.DataPath, parentDir, path)
 	entries, err := os.ReadDir(dirPath)
 	if err != nil {
@@ -31,7 +32,6 @@ func FileList(parentDir, path string) []entity.FileInfo {
 			continue
 		}
 		result = append(result, entity.FileInfo{
-			Path:       filepath.Join(path),
 			Name:       entry.Name(),
 			Size:       info.Size(),
 			UpdateTime: info.ModTime().UnixMilli(),
@@ -52,6 +52,8 @@ func FileList(parentDir, path string) []entity.FileInfo {
 // 下载文件
 func FileDownload(ctx iris.Context, parentDir, path, fileName string) {
 	// 判断是目录还是文件
+	path = filepath.Clean("/" + path)
+	fileName = filepath.Clean("/" + fileName)
 	filePath := filepath.Join(common.DataPath, parentDir, path, fileName)
 	isDir, err := util.PathIsDir(filePath)
 	if err != nil {
@@ -70,6 +72,8 @@ func FileDownload(ctx iris.Context, parentDir, path, fileName string) {
 // 创建目录
 func FileFolder(parentDir, path, fileName string) {
 	// 判断目录是否存在
+	path = filepath.Clean("/" + path)
+	fileName = filepath.Clean("/" + fileName)
 	filePath := filepath.Join(common.DataPath, parentDir, path, fileName)
 	_, err := util.PathIsDir(filePath)
 	if err == nil {
@@ -90,6 +94,7 @@ func FileUpload(ctx iris.Context, parentDir string) {
 
 	// 获取文件
 	path := ctx.FormValue("path")
+	path = filepath.Clean("/" + path)
 	file, fileHeader, err := ctx.FormFile("file")
 	if err != nil {
 		panic(common.NewErr("上传失败", err))
@@ -123,6 +128,8 @@ func FileUpload(ctx iris.Context, parentDir string) {
 
 // 删除文件
 func FileDelete(parentDir, path, fileName string) {
+	path = filepath.Clean("/" + path)
+	fileName = filepath.Clean("/" + fileName)
 	err := os.RemoveAll(filepath.Join(common.DataPath, parentDir, path, fileName))
 	if err != nil {
 		panic(common.NewErr("文件删除失败", err))
