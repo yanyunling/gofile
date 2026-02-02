@@ -18,7 +18,7 @@ func InitLog() {
 	// 文件输出
 	logger := &lumberjack.Logger{
 		Filename:   filepath.Join(common.LogPath, "app.log"),
-		MaxSize:    100,
+		MaxSize:    10,
 		MaxBackups: 30,
 		MaxAge:     30,
 		Compress:   true,
