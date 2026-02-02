@@ -6,6 +6,7 @@ import (
 	"gofile/controller"
 	"gofile/middleware"
 	"gofile/model/common"
+	"gofile/util"
 	"io/fs"
 	"net/http"
 	"time"
@@ -22,7 +23,7 @@ func init() {
 	flag.StringVar(&common.Port, "p", "9300", "监听端口")
 	flag.StringVar(&common.LogPath, "log", "./logs", "日志目录，存放近30天的日志")
 	flag.StringVar(&common.DataPath, "data", "./data", "数据目录，存放数据库及文件资源")
-	flag.StringVar(&common.AdminPassword, "admin_password", "$2b$10$nHhk5.4ri8Iss0PVaX29BOSqfUSM.i5S7Mb9BBOOgrXPqTUcyNv..", "超级管理员密码")
+	flag.StringVar(&common.AdminPassword, "pass", "Admin123", "超级管理员密码")
 	flag.Parse()
 
 	// 固定配置
@@ -30,6 +31,14 @@ func init() {
 	common.PrivateDirName = "private"
 	common.ProtectedDirName = "protected"
 	common.PublicDirName = "public"
+
+	// 超级管理员密码加密
+	password, err := util.EncryptBcrypt(util.EncryptSHA256([]byte(common.AdminPassword)))
+	if err != nil {
+		golog.Error("超级管理员密码加密失败")
+		return
+	}
+	common.AdminPassword = password
 }
 
 func main() {
