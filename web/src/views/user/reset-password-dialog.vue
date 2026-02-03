@@ -1,13 +1,5 @@
 <template>
-  <el-dialog
-    :model-value="props.visible"
-    title="重置密码"
-    append-to-body
-    destroy-on-close
-    width="400"
-    :before-close="beforeClose"
-    center
-  >
+  <el-dialog :model-value="props.visible" title="重置密码" append-to-body destroy-on-close width="400" :before-close="beforeClose" center>
     <el-form :model="formData" label-width="auto" :rules="rules" ref="formRef">
       <el-form-item label="用户名" prop="username">
         <el-input v-model="formData.username" readonly></el-input>
@@ -48,7 +40,9 @@ const formData: Ref<User> = ref({
   username: "",
   password: "",
   enable: 1,
-  hasUpdate: 0,
+  publicAuth: 0,
+  protectedAuth: 0,
+  privateAuth: 0,
 });
 const rules = {
   password: [
@@ -93,7 +87,9 @@ const setFormData = (user: User) => {
   formData.value.id = user.id;
   formData.value.username = user.username;
   formData.value.enable = user.enable;
-  formData.value.hasUpdate = user.hasUpdate;
+  formData.value.publicAuth = user.publicAuth;
+  formData.value.protectedAuth = user.protectedAuth;
+  formData.value.privateAuth = user.privateAuth;
 };
 
 /**
@@ -105,6 +101,8 @@ const beforeClose = () => {
   formData.value.username = "";
   formData.value.password = "";
   formData.value.enable = 1;
-  formData.value.hasUpdate = 0;
+  formData.value.publicAuth = 0;
+  formData.value.protectedAuth = 0;
+  formData.value.privateAuth = 0;
 };
 </script>
