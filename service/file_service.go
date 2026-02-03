@@ -101,9 +101,6 @@ func FileUpload(ctx iris.Context, parentDir string) {
 	}
 	defer file.Close()
 
-	// 创建目录
-	os.MkdirAll(filepath.Join(common.DataPath, parentDir, path), 0755)
-
 	// 判断文件是否存在
 	filePath := filepath.Join(common.DataPath, parentDir, path, fileHeader.Filename)
 	_, err = util.PathIsDir(filePath)
