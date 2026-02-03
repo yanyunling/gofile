@@ -21,10 +21,22 @@
           <el-radio :value="0" border>停用</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="可以更新" prop="hasUpdate">
-        <el-radio-group v-model="formData.hasUpdate">
-          <el-radio :value="1" border>是</el-radio>
-          <el-radio :value="0" border>否</el-radio>
+      <el-form-item label="公开文件权限" prop="publicAuth">
+        <el-radio-group v-model="formData.publicAuth">
+          <el-radio :value="1" border>有</el-radio>
+          <el-radio :value="0" border>无</el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="保护文件权限" prop="protectedAuth">
+        <el-radio-group v-model="formData.protectedAuth">
+          <el-radio :value="1" border>有</el-radio>
+          <el-radio :value="0" border>无</el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="私有文件权限" prop="privateAuth">
+        <el-radio-group v-model="formData.privateAuth">
+          <el-radio :value="1" border>有</el-radio>
+          <el-radio :value="0" border>无</el-radio>
         </el-radio-group>
       </el-form-item>
     </el-form>
@@ -60,7 +72,9 @@ const formData: Ref<User> = ref({
   username: "",
   password: "",
   enable: 1,
-  hasUpdate: 0,
+  publicAuth: 0,
+  protectedAuth: 0,
+  privateAuth: 0,
 });
 const rules = {
   username: [
@@ -110,7 +124,9 @@ const setFormData = (user: User) => {
   formData.value.id = user.id;
   formData.value.username = user.username;
   formData.value.enable = user.enable;
-  formData.value.hasUpdate = user.hasUpdate;
+  formData.value.publicAuth = user.publicAuth;
+  formData.value.protectedAuth = user.protectedAuth;
+  formData.value.privateAuth = user.privateAuth;
 };
 
 /**
@@ -121,6 +137,8 @@ const beforeClose = () => {
   formData.value.username = "";
   formData.value.password = "";
   formData.value.enable = 1;
-  formData.value.hasUpdate = 0;
+  formData.value.publicAuth = 0;
+  formData.value.protectedAuth = 0;
+  formData.value.privateAuth = 0;
 };
 </script>

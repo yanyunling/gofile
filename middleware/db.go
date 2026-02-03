@@ -20,7 +20,9 @@ CREATE TABLE IF NOT EXISTS t_user
 	username text NOT NULL,
 	password text NOT NULL,
 	enable int NOT NULL,
-	has_update int NOT NULL
+	public_auth int NOT NULL,
+	protected_auth int NOT NULL,
+	private_auth int NOT NULL
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS "user_username"

@@ -3,7 +3,9 @@ interface TokenResult {
   refreshToken: string;
   isAdmin: boolean;
   username: string;
-  hasUpdate: number;
+  publicAuth: number;
+  protectedAuth: number;
+  privateAuth: number;
 }
 
 interface CaptchaResult {

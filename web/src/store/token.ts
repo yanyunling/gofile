@@ -5,7 +5,9 @@ interface TokenStore {
   refreshToken: string;
   isAdmin: boolean;
   username: string;
-  hasUpdate: number;
+  publicAuth: number;
+  protectedAuth: number;
+  privateAuth: number;
 }
 
 export const useTokenStore = defineStore("token", {
@@ -14,7 +16,9 @@ export const useTokenStore = defineStore("token", {
     refreshToken: "",
     isAdmin: false,
     username: "",
-    hasUpdate: 0,
+    publicAuth: 0,
+    protectedAuth: 0,
+    privateAuth: 0,
   }),
   actions: {
     /**
@@ -25,7 +29,9 @@ export const useTokenStore = defineStore("token", {
       this.accessToken = tokenResult.accessToken;
       this.refreshToken = tokenResult.refreshToken;
       this.isAdmin = tokenResult.isAdmin;
-      this.hasUpdate = tokenResult.hasUpdate;
+      this.publicAuth = tokenResult.publicAuth;
+      this.protectedAuth = tokenResult.protectedAuth;
+      this.privateAuth = tokenResult.privateAuth;
       this.username = tokenResult.username;
     },
     /**
@@ -35,7 +41,9 @@ export const useTokenStore = defineStore("token", {
       this.accessToken = "";
       this.refreshToken = "";
       this.isAdmin = false;
-      this.hasUpdate = 0;
+      this.publicAuth = 0;
+      this.protectedAuth = 0;
+      this.privateAuth = 0;
     },
   },
   persist: true,

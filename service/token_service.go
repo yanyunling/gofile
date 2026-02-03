@@ -65,7 +65,9 @@ func SignIn(signIn common.SignIn) common.TokenResult {
 	tokenResult.RefreshToken = refreshToken
 	tokenResult.IsAdmin = adminUser.Id == userFromDB.Id
 	tokenResult.Username = userFromDB.Username
-	tokenResult.HasUpdate = userFromDB.HasUpdate
+	tokenResult.PublicAuth = userFromDB.PublicAuth
+	tokenResult.ProtectedAuth = userFromDB.ProtectedAuth
+	tokenResult.PrivateAuth = userFromDB.PrivateAuth
 
 	// 缓存数据
 	tokenCache := common.TokenCache{}
@@ -74,7 +76,9 @@ func SignIn(signIn common.SignIn) common.TokenResult {
 	tokenCache.IsAdmin = adminUser.Id == userFromDB.Id
 	tokenCache.UserId = userFromDB.Id
 	tokenCache.Username = userFromDB.Username
-	tokenCache.HasUpdate = userFromDB.HasUpdate
+	tokenCache.PublicAuth = userFromDB.PublicAuth
+	tokenCache.ProtectedAuth = userFromDB.ProtectedAuth
+	tokenCache.PrivateAuth = userFromDB.PrivateAuth
 
 	// 缓存token
 	cache2go.Cache(common.AccessTokenCache).Add(tokenResult.AccessToken, AccessTokenExpire, &tokenCache)
@@ -133,7 +137,9 @@ func TokenRefresh(refreshToken string) common.TokenResult {
 	tokenResult.RefreshToken = refreshToken
 	tokenResult.IsAdmin = adminUser.Id == userFromDB.Id
 	tokenResult.Username = userFromDB.Username
-	tokenResult.HasUpdate = userFromDB.HasUpdate
+	tokenResult.PublicAuth = userFromDB.PublicAuth
+	tokenResult.ProtectedAuth = userFromDB.ProtectedAuth
+	tokenResult.PrivateAuth = userFromDB.PrivateAuth
 
 	// 缓存数据
 	newTokenCache := common.TokenCache{}
@@ -142,7 +148,9 @@ func TokenRefresh(refreshToken string) common.TokenResult {
 	newTokenCache.IsAdmin = adminUser.Id == userFromDB.Id
 	newTokenCache.UserId = userFromDB.Id
 	newTokenCache.Username = userFromDB.Username
-	tokenCache.HasUpdate = userFromDB.HasUpdate
+	newTokenCache.PublicAuth = userFromDB.PublicAuth
+	newTokenCache.ProtectedAuth = userFromDB.ProtectedAuth
+	newTokenCache.PrivateAuth = userFromDB.PrivateAuth
 
 	// 缓存token
 	cache2go.Cache(common.AccessTokenCache).Add(newTokenCache.AccessToken, AccessTokenExpire, &newTokenCache)

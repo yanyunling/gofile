@@ -27,10 +27,22 @@
             <el-tag v-else type="danger" disable-transitions>停用</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="hasUpdate" label="可以更新" align="center">
+        <el-table-column prop="publicAuth" label="公开文件权限" align="center">
           <template #default="scope">
-            <el-tag v-if="scope.row.hasUpdate === 1" type="success" disable-transitions>是</el-tag>
-            <el-tag v-else type="danger" disable-transitions>否</el-tag>
+            <el-tag v-if="scope.row.publicAuth === 1" type="success" disable-transitions>有</el-tag>
+            <el-tag v-else type="danger" disable-transitions>无</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="protectedAuth" label="保护文件权限" align="center">
+          <template #default="scope">
+            <el-tag v-if="scope.row.protectedAuth === 1" type="success" disable-transitions>有</el-tag>
+            <el-tag v-else type="danger" disable-transitions>无</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="privateAuth" label="私有文件权限" align="center">
+          <template #default="scope">
+            <el-tag v-if="scope.row.privateAuth === 1" type="success" disable-transitions>有</el-tag>
+            <el-tag v-else type="danger" disable-transitions>无</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="" label="" align="center" width="180">
@@ -128,7 +140,9 @@ const addClick = () => {
     username: "",
     password: "",
     enable: 1,
-    hasUpdate: 0,
+    publicAuth: 0,
+    protectedAuth: 0,
+    privateAuth: 0,
   };
   dialogVisible.value = true;
 };

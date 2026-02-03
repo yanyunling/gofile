@@ -104,7 +104,7 @@ import { formatTime, uuid } from "@/utils";
 import { AxiosProgressEvent } from "axios";
 
 const tokenStore = useTokenStore();
-const { isAdmin, accessToken, hasUpdate } = storeToRefs(tokenStore);
+const { isAdmin, accessToken, publicAuth, protectedAuth, privateAuth } = storeToRefs(tokenStore);
 const currentMenu = ref("public");
 const loading = ref(false);
 const fileList: Ref<FileInfo[]> = ref([]);
@@ -131,7 +131,13 @@ const updateAuth = () => {
   if (isAdmin.value) {
     return true;
   }
-  if (currentMenu.value === "private" && hasUpdate.value) {
+  if (currentMenu.value === "public" && publicAuth.value) {
+    return true;
+  }
+  if (currentMenu.value === "protected" && protectedAuth.value) {
+    return true;
+  }
+  if (currentMenu.value === "private" && privateAuth.value) {
     return true;
   }
   return false;
@@ -201,6 +207,7 @@ const uploadClick = () => {
     openDrawer(id);
     fileFunc(pathList.value.join("/"), fileList[0], onProgress, id)
       .then(() => {
+        ElMessage.success("上传成功");
         if (id === drawerData.value.id) {
           drawerData.value.finished = "成功";
         }

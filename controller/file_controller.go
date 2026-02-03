@@ -80,6 +80,12 @@ func FileDownloadPrivate(ctx iris.Context) {
 
 // 创建公开目录
 func FileFolderPublic(ctx iris.Context) {
+	// 判断用户是否有更新权限
+	tokenCache := middleware.CurrentUserCache(ctx)
+	if !tokenCache.IsAdmin && tokenCache.PublicAuth != 1 {
+		panic(common.NewError("无权限操作"))
+	}
+
 	fileInfo := entity.FileInfo{}
 	resolveParam(ctx, &fileInfo)
 	service.FileFolder(common.PublicDirName, fileInfo.Path, fileInfo.Name)
@@ -88,6 +94,12 @@ func FileFolderPublic(ctx iris.Context) {
 
 // 创建保护目录
 func FileFolderProtected(ctx iris.Context) {
+	// 判断用户是否有更新权限
+	tokenCache := middleware.CurrentUserCache(ctx)
+	if !tokenCache.IsAdmin && tokenCache.ProtectedAuth != 1 {
+		panic(common.NewError("无权限操作"))
+	}
+
 	fileInfo := entity.FileInfo{}
 	resolveParam(ctx, &fileInfo)
 	service.FileFolder(common.ProtectedDirName, fileInfo.Path, fileInfo.Name)
@@ -106,7 +118,7 @@ func FileFolderPrivate(ctx iris.Context) {
 		path = common.PrivateDirName
 	} else {
 		// 判断用户是否有更新权限
-		if tokenCache.HasUpdate != 1 {
+		if tokenCache.PrivateAuth != 1 {
 			panic(common.NewError("无权限操作"))
 		}
 		path = filepath.Join(common.PrivateDirName, tokenCache.Username)
@@ -118,12 +130,24 @@ func FileFolderPrivate(ctx iris.Context) {
 
 // 上传公开文件
 func FileUploadPublic(ctx iris.Context) {
+	// 判断用户是否有更新权限
+	tokenCache := middleware.CurrentUserCache(ctx)
+	if !tokenCache.IsAdmin && tokenCache.PublicAuth != 1 {
+		panic(common.NewError("无权限操作"))
+	}
+
 	service.FileUpload(ctx, common.PublicDirName)
 	ctx.JSON(common.NewSuccess("上传成功"))
 }
 
 // 上传保护文件
 func FileUploadProtected(ctx iris.Context) {
+	// 判断用户是否有更新权限
+	tokenCache := middleware.CurrentUserCache(ctx)
+	if !tokenCache.IsAdmin && tokenCache.ProtectedAuth != 1 {
+		panic(common.NewError("无权限操作"))
+	}
+
 	service.FileUpload(ctx, common.ProtectedDirName)
 	ctx.JSON(common.NewSuccess("上传成功"))
 }
@@ -137,7 +161,7 @@ func FileUploadPrivate(ctx iris.Context) {
 		path = common.PrivateDirName
 	} else {
 		// 判断用户是否有更新权限
-		if tokenCache.HasUpdate != 1 {
+		if tokenCache.PrivateAuth != 1 {
 			panic(common.NewError("无权限操作"))
 		}
 		path = filepath.Join(common.PrivateDirName, tokenCache.Username)
@@ -149,6 +173,12 @@ func FileUploadPrivate(ctx iris.Context) {
 
 // 删除公开文件
 func FileDeletePublic(ctx iris.Context) {
+	// 判断用户是否有更新权限
+	tokenCache := middleware.CurrentUserCache(ctx)
+	if !tokenCache.IsAdmin && tokenCache.PublicAuth != 1 {
+		panic(common.NewError("无权限操作"))
+	}
+
 	fileInfo := entity.FileInfo{}
 	resolveParam(ctx, &fileInfo)
 	service.FileDelete(common.PublicDirName, fileInfo.Path, fileInfo.Name)
@@ -157,6 +187,12 @@ func FileDeletePublic(ctx iris.Context) {
 
 // 删除保护文件
 func FileDeleteProtected(ctx iris.Context) {
+	// 判断用户是否有更新权限
+	tokenCache := middleware.CurrentUserCache(ctx)
+	if !tokenCache.IsAdmin && tokenCache.ProtectedAuth != 1 {
+		panic(common.NewError("无权限操作"))
+	}
+
 	fileInfo := entity.FileInfo{}
 	resolveParam(ctx, &fileInfo)
 	service.FileDelete(common.ProtectedDirName, fileInfo.Path, fileInfo.Name)
@@ -175,7 +211,7 @@ func FileDeletePrivate(ctx iris.Context) {
 		path = common.PrivateDirName
 	} else {
 		// 判断用户是否有更新权限
-		if tokenCache.HasUpdate != 1 {
+		if tokenCache.PrivateAuth != 1 {
 			panic(common.NewError("无权限操作"))
 		}
 		path = filepath.Join(common.PrivateDirName, tokenCache.Username)

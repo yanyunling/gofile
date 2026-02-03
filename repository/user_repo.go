@@ -58,12 +58,16 @@ func UserPage(db *sqlx.DB, page common.Page, condition string) ([]entity.User, i
 		sqlCompletion.EqOr("enable", 0)
 	}
 
-	// 可以更新筛选特殊处理，根据是和否区分
+	// 更新权限筛选特殊处理，根据有和无区分
 	switch condition {
-	case "是":
-		sqlCompletion.EqOr("has_update", 1)
-	case "否":
-		sqlCompletion.EqOr("has_update", 0)
+	case "有":
+		sqlCompletion.EqOr("public_auth", 1)
+		sqlCompletion.EqOr("protected_auth", 1)
+		sqlCompletion.EqOr("private_auth", 1)
+	case "无":
+		sqlCompletion.EqOr("public_auth", 0)
+		sqlCompletion.EqOr("protected_auth", 0)
+		sqlCompletion.EqOr("private_auth", 0)
 	}
 
 	sqlCompletion.LikeOr([]string{"username"}, condition)
@@ -100,13 +104,17 @@ func UserAdd(tx *sqlx.Tx, user entity.User) error {
 	username,
 	password,
 	enable,
-	has_update)
+	public_auth,
+	protected_auth,
+	private_auth)
 	values 
 	(:id,
 	:username,
 	:password,
 	:enable,
-	:has_update)`
+	:public_auth,
+	:protected_auth,
+	:private_auth)`
 	_, err := tx.NamedExec(sql, user)
 	return err
 }
@@ -115,7 +123,9 @@ func UserAdd(tx *sqlx.Tx, user entity.User) error {
 func UserUpdate(tx *sqlx.Tx, user entity.User) error {
 	sql := `update t_user set 
 	enable=:enable,
-	has_update=:has_update
+	public_auth=:public_auth,
+	protected_auth=:protected_auth,
+	private_auth=:private_auth
 	where id=:id`
 	_, err := tx.NamedExec(sql, user)
 	return err

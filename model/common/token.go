@@ -1,20 +1,24 @@
 package common
 
 type TokenResult struct {
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
-	IsAdmin      bool   `json:"isAdmin"`
-	Username     string `json:"username"`
-	HasUpdate    int    `json:"hasUpdate"`
+	AccessToken   string `json:"accessToken"`
+	RefreshToken  string `json:"refreshToken"`
+	IsAdmin       bool   `json:"isAdmin"`
+	Username      string `json:"username"`
+	PublicAuth    int    `json:"publicAuth"`
+	ProtectedAuth int    `json:"protectedAuth"`
+	PrivateAuth   int    `json:"privateAuth"`
 }
 
 type TokenCache struct {
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
-	UserId       string `json:"userId"`
-	IsAdmin      bool   `json:"isAdmin"`
-	Username     string `json:"username"`
-	HasUpdate    int    `json:"hasUpdate"`
+	AccessToken   string `json:"accessToken"`
+	RefreshToken  string `json:"refreshToken"`
+	UserId        string `json:"userId"`
+	IsAdmin       bool   `json:"isAdmin"`
+	Username      string `json:"username"`
+	PublicAuth    int    `json:"publicAuth"`
+	ProtectedAuth int    `json:"protectedAuth"`
+	PrivateAuth   int    `json:"privateAuth"`
 }
 
 type SignIn struct {

@@ -3,5 +3,7 @@ interface User {
   username: string;
   password: string;
   enable: number;
-  hasUpdate: number;
+  publicAuth: number;
+  protectedAuth: number;
+  privateAuth: number;
 }
