@@ -54,6 +54,7 @@ class FileApi {
       method: "post",
       url: "/file/public/download",
       responseType: "blob",
+      timeout: 0,
       data: { path: path, name: name },
       onDownloadProgress: (progressEvent) => {
         onProgress(progressEvent, name, false, id);
@@ -74,6 +75,7 @@ class FileApi {
       method: "post",
       url: "/file/protected/download",
       responseType: "blob",
+      timeout: 0,
       data: { path: path, name: name },
       onDownloadProgress: (progressEvent) => {
         onProgress(progressEvent, name, false, id);
@@ -94,9 +96,79 @@ class FileApi {
       method: "post",
       url: "/file/private/download",
       responseType: "blob",
+      timeout: 0,
       data: { path: path, name: name },
       onDownloadProgress: (progressEvent) => {
         onProgress(progressEvent, name, false, id);
+      },
+    });
+  }
+
+  /**
+   * 上传公开文件
+   * @param path
+   * @param file
+   * @param onProgress
+   * @param id
+   * @returns
+   */
+  uploadPublic(path: string, file: File, onProgress: Function, id: string) {
+    const formData = new FormData();
+    formData.append("path", path);
+    formData.append("file", file);
+    return request<null>({
+      method: "post",
+      url: "/file/public/upload",
+      timeout: 0,
+      data: formData,
+      onUploadProgress(progressEvent) {
+        onProgress(progressEvent, file.name, true, id);
+      },
+    });
+  }
+
+  /**
+   * 上传保护文件
+   * @param path
+   * @param file
+   * @param onProgress
+   * @param id
+   * @returns
+   */
+  uploadProtected(path: string, file: File, onProgress: Function, id: string) {
+    const formData = new FormData();
+    formData.append("path", path);
+    formData.append("file", file);
+    return request<null>({
+      method: "post",
+      url: "/file/protected/upload",
+      timeout: 0,
+      data: formData,
+      onUploadProgress(progressEvent) {
+        onProgress(progressEvent, file.name, true, id);
+      },
+    });
+  }
+
+  /**
+   * 上传私有文件
+   * @param path
+   * @param file
+   * @param onProgress
+   * @param id
+   * @returns
+   */
+  uploadPrivate(path: string, file: File, onProgress: Function, id: string) {
+    const formData = new FormData();
+    formData.append("path", path);
+    formData.append("file", file);
+    return request<null>({
+      method: "post",
+      url: "/file/private/upload",
+      timeout: 0,
+      data: formData,
+      onUploadProgress(progressEvent) {
+        onProgress(progressEvent, file.name, true, id);
       },
     });
   }
@@ -140,72 +212,6 @@ class FileApi {
       method: "post",
       url: "/file/private/folder",
       data: { path: path, name: name },
-    });
-  }
-
-  /**
-   * 上传公开文件
-   * @param path
-   * @param file
-   * @param onProgress
-   * @param id
-   * @returns
-   */
-  uploadPublic(path: string, file: File, onProgress: Function, id: string) {
-    const formData = new FormData();
-    formData.append("path", path);
-    formData.append("file", file);
-    return request<null>({
-      method: "post",
-      url: "/file/public/upload",
-      data: formData,
-      onUploadProgress(progressEvent) {
-        onProgress(progressEvent, file.name, true, id);
-      },
-    });
-  }
-
-  /**
-   * 上传保护文件
-   * @param path
-   * @param file
-   * @param onProgress
-   * @param id
-   * @returns
-   */
-  uploadProtected(path: string, file: File, onProgress: Function, id: string) {
-    const formData = new FormData();
-    formData.append("path", path);
-    formData.append("file", file);
-    return request<null>({
-      method: "post",
-      url: "/file/protected/upload",
-      data: formData,
-      onUploadProgress(progressEvent) {
-        onProgress(progressEvent, file.name, true, id);
-      },
-    });
-  }
-
-  /**
-   * 上传私有文件
-   * @param path
-   * @param file
-   * @param onProgress
-   * @param id
-   * @returns
-   */
-  uploadPrivate(path: string, file: File, onProgress: Function, id: string) {
-    const formData = new FormData();
-    formData.append("path", path);
-    formData.append("file", file);
-    return request<null>({
-      method: "post",
-      url: "/file/private/upload",
-      data: formData,
-      onUploadProgress(progressEvent) {
-        onProgress(progressEvent, file.name, true, id);
-      },
     });
   }
 
