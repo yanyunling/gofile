@@ -81,7 +81,7 @@ func FileFolder(parentDir, path, fileName string) {
 	}
 
 	// 创建目录
-	err = os.MkdirAll(filePath, 0755)
+	err = os.Mkdir(filePath, 0755)
 	if err != nil {
 		panic(common.NewErr("目录创建失败", err))
 	}
