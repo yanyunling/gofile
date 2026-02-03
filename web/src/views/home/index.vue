@@ -42,6 +42,11 @@
               <el-tag v-else type="success" disable-transitions>文件</el-tag>
             </template>
           </el-table-column>
+          <el-table-column prop="type" label="文件类型" align="center" width="150">
+            <template #default="scope">
+              {{ scope.row.isDir ? "--" : Upload.getFileExtension(scope.row.name) }}
+            </template>
+          </el-table-column>
           <el-table-column prop="size" label="文件大小" align="center" width="150">
             <template #default="scope">
               {{ scope.row.isDir ? "--" : Upload.formatFileSize(scope.row.size) }}
@@ -68,6 +73,21 @@
         </el-table>
       </div>
     </div>
+    <el-drawer v-model="drawerData.visible" :title="drawerData.isUpload ? '文件上传' : '文件下载'" direction="ltr">
+      <el-descriptions direction="vertical" :column="1" border>
+        <el-descriptions-item label="文件名">{{ drawerData.fileName }}</el-descriptions-item>
+        <el-descriptions-item label="文件大小">{{ drawerData.total }}</el-descriptions-item>
+        <el-descriptions-item :label="drawerData.isUpload ? '已上传大小' : '已下载大小'">{{ drawerData.loaded }}</el-descriptions-item>
+        <el-descriptions-item :label="drawerData.isUpload ? '上传结果' : '下载结果'">
+          <el-tag v-if="drawerData.finished === '成功'" type="success" disable-transitions>成功</el-tag>
+          <el-tag v-else-if="drawerData.finished === '失败'" type="danger" disable-transitions>失败</el-tag>
+          <el-tag v-else disable-transitions>进行中</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item :label="drawerData.isUpload ? '上传进度' : '下载进度'">
+          <el-progress :percentage="drawerData.percent" :stroke-width="20" striped striped-flow :duration="20" />
+        </el-descriptions-item>
+      </el-descriptions>
+    </el-drawer>
   </div>
 </template>
 
@@ -80,7 +100,8 @@ import { Upload } from "@/utils/upload";
 import { useTokenStore } from "@/store/token";
 import { storeToRefs } from "pinia";
 import { FolderChecked, Lock, User } from "@element-plus/icons-vue";
-import { formatTime } from "@/utils";
+import { formatTime, uuid } from "@/utils";
+import { AxiosProgressEvent } from "axios";
 
 const tokenStore = useTokenStore();
 const { isAdmin, accessToken, hasUpdate } = storeToRefs(tokenStore);
@@ -88,6 +109,16 @@ const currentMenu = ref("public");
 const loading = ref(false);
 const fileList: Ref<FileInfo[]> = ref([]);
 const pathList: Ref<string[]> = ref([]);
+const drawerData = ref({
+  visible: false,
+  id: "",
+  fileName: "",
+  isUpload: false,
+  finished: "",
+  loaded: "",
+  total: "",
+  percent: 0,
+});
 
 onMounted(() => {
   queryFileList();
@@ -166,17 +197,84 @@ const uploadClick = () => {
     }
     const fileFunc =
       currentMenu.value === "public" ? FileApi.uploadPublic : currentMenu.value === "protected" ? FileApi.uploadProtected : FileApi.uploadPrivate;
-    ElMessage.info("正在上传文件，请稍候...");
-    loading.value = true;
-    fileFunc(pathList.value.join("/"), fileList[0])
-      .then((res) => {
-        ElMessage.success(res.message);
+    const id = uuid();
+    openDrawer(id);
+    fileFunc(pathList.value.join("/"), fileList[0], onProgress, id)
+      .then(() => {
+        if (id === drawerData.value.id) {
+          drawerData.value.finished = "成功";
+        }
         queryFileList();
       })
       .catch(() => {
-        loading.value = false;
+        if (id === drawerData.value.id) {
+          drawerData.value.finished = "失败";
+        }
       });
   });
+};
+
+/**
+ * 下载
+ */
+const downloadClick = (row: FileInfo) => {
+  const fileName = row.name;
+  const fileFunc =
+    currentMenu.value === "public" ? FileApi.downloadPublic : currentMenu.value === "protected" ? FileApi.downloadProtected : FileApi.downloadPrivate;
+  const id = uuid();
+  openDrawer(id);
+  fileFunc(pathList.value.join("/"), fileName, onProgress, id)
+    .then((res) => {
+      saveAs(res, fileName);
+      if (id === drawerData.value.id) {
+        drawerData.value.finished = "成功";
+      }
+    })
+    .catch(() => {
+      if (id === drawerData.value.id) {
+        drawerData.value.finished = "失败";
+      }
+    });
+};
+
+/**
+ * 上传/下载进度
+ * @param progressEvent
+ * @param fileName
+ * @param isUpload
+ * @param id
+ */
+const onProgress = (progressEvent: AxiosProgressEvent, fileName: string, isUpload: boolean, id: string) => {
+  // 根据id判断进度是否显示
+  if (drawerData.value.id !== id) {
+    return;
+  }
+  drawerData.value.isUpload = isUpload;
+  drawerData.value.fileName = fileName;
+  if (progressEvent.loaded) {
+    drawerData.value.loaded = Upload.formatFileSize(progressEvent.loaded);
+  }
+  if (progressEvent.total) {
+    drawerData.value.total = Upload.formatFileSize(progressEvent.total);
+  }
+  if (progressEvent.progress) {
+    drawerData.value.percent = Math.round(progressEvent.progress * 100);
+  }
+};
+
+/**
+ * 打开进度抽屉
+ * @param id
+ */
+const openDrawer = (id: string) => {
+  drawerData.value.id = id;
+  drawerData.value.finished = "进行中";
+  drawerData.value.isUpload = false;
+  drawerData.value.fileName = "";
+  drawerData.value.loaded = "";
+  drawerData.value.total = "";
+  drawerData.value.percent = 0;
+  drawerData.value.visible = true;
 };
 
 /**
@@ -198,19 +296,6 @@ const createFolderClick = () => {
       .catch(() => {
         loading.value = false;
       });
-  });
-};
-
-/**
- * 下载
- */
-const downloadClick = (row: FileInfo) => {
-  const fileFunc =
-    currentMenu.value === "public" ? FileApi.downloadPublic : currentMenu.value === "protected" ? FileApi.downloadProtected : FileApi.downloadPrivate;
-  ElMessage.info("正在下载文件，请稍候...");
-  fileFunc(pathList.value.join("/"), row.name).then((res) => {
-    saveAs(res, row.name);
-    ElMessage.success("下载成功");
   });
 };
 
@@ -244,7 +329,7 @@ const deleteClick = (row: FileInfo) => {
   overflow: hidden;
   .left-view {
     background: #fff;
-    height: 100%;
+    height: calc(100% - 10px);
     width: 180px;
     overflow: auto;
     padding-top: 10px;

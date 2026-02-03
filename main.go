@@ -51,9 +51,6 @@ func main() {
 	// 全局异常恢复
 	app.Use(middleware.GlobalRecover)
 
-	// gzip压缩
-	app.Use(iris.Compression)
-
 	// 初始化验证码组件
 	err := middleware.InitCaptcha()
 	if err != nil {
@@ -75,6 +72,9 @@ func main() {
 
 	// 初始化API路由
 	controller.InitRouter(app)
+
+	// gzip压缩
+	app.Use(iris.Compression)
 
 	// 网页资源路由
 	app.Use(iris.StaticCache(time.Hour * 720))

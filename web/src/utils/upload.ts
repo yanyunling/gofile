@@ -59,6 +59,20 @@ export class Upload {
   }
 
   /**
+   * 获取文件后缀名
+   * @param fileName
+   * @returns
+   */
+  static getFileExtension(fileName: string) {
+    let splits = fileName.split(".");
+    let ext = "";
+    if (splits.length > 1) {
+      ext = splits[splits.length - 1].toLowerCase();
+    }
+    return ext;
+  }
+
+  /**
    * 将Blob读取为ArrayBuffer
    * @param blob
    * @returns
@@ -124,15 +138,15 @@ export class Upload {
    * @param size
    */
   static formatFileSize(size: number) {
-    if (size < 1000) {
+    if (size < 1024) {
       return size + "B";
     }
-    if (size < 1000 * 1000) {
-      return (size / 1000).toFixed(2) + "KB";
+    if (size < 1024 * 1024) {
+      return (size / 1024).toFixed(2) + "KB";
     }
-    if (size < 1000 * 1000 * 1000) {
-      return (size / 1000 / 1000).toFixed(2) + "MB";
+    if (size < 1024 * 1024 * 1024) {
+      return (size / 1024 / 1024).toFixed(2) + "MB";
     }
-    return (size / 1000 / 1000 / 1000).toFixed(2) + "GB";
+    return (size / 1024 / 1024 / 1024).toFixed(2) + "GB";
   }
 }

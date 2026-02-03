@@ -45,14 +45,19 @@ class FileApi {
    * 下载公开文件
    * @param path
    * @param name
+   * @param onProgress
+   * @param id
    * @returns
    */
-  downloadPublic(path: string, name: string) {
+  downloadPublic(path: string, name: string, onProgress: Function, id: string) {
     return openRequest<Blob>({
       method: "post",
       url: "/file/public/download",
       responseType: "blob",
       data: { path: path, name: name },
+      onDownloadProgress: (progressEvent) => {
+        onProgress(progressEvent, name, false, id);
+      },
     });
   }
 
@@ -60,14 +65,19 @@ class FileApi {
    * 下载保护文件
    * @param path
    * @param name
+   * @param onProgress
+   * @param id
    * @returns
    */
-  downloadProtected(path: string, name: string) {
+  downloadProtected(path: string, name: string, onProgress: Function, id: string) {
     return request<Blob>({
       method: "post",
       url: "/file/protected/download",
       responseType: "blob",
       data: { path: path, name: name },
+      onDownloadProgress: (progressEvent) => {
+        onProgress(progressEvent, name, false, id);
+      },
     });
   }
 
@@ -75,14 +85,19 @@ class FileApi {
    * 下载私有文件
    * @param path
    * @param name
+   * @param onProgress
+   * @param id
    * @returns
    */
-  downloadPrivate(path: string, name: string) {
+  downloadPrivate(path: string, name: string, onProgress: Function, id: string) {
     return request<Blob>({
       method: "post",
       url: "/file/private/download",
       responseType: "blob",
       data: { path: path, name: name },
+      onDownloadProgress: (progressEvent) => {
+        onProgress(progressEvent, name, false, id);
+      },
     });
   }
 
@@ -132,9 +147,11 @@ class FileApi {
    * 上传公开文件
    * @param path
    * @param file
+   * @param onProgress
+   * @param id
    * @returns
    */
-  uploadPublic(path: string, file: File) {
+  uploadPublic(path: string, file: File, onProgress: Function, id: string) {
     const formData = new FormData();
     formData.append("path", path);
     formData.append("file", file);
@@ -142,6 +159,9 @@ class FileApi {
       method: "post",
       url: "/file/public/upload",
       data: formData,
+      onUploadProgress(progressEvent) {
+        onProgress(progressEvent, file.name, true, id);
+      },
     });
   }
 
@@ -149,9 +169,11 @@ class FileApi {
    * 上传保护文件
    * @param path
    * @param file
+   * @param onProgress
+   * @param id
    * @returns
    */
-  uploadProtected(path: string, file: File) {
+  uploadProtected(path: string, file: File, onProgress: Function, id: string) {
     const formData = new FormData();
     formData.append("path", path);
     formData.append("file", file);
@@ -159,6 +181,9 @@ class FileApi {
       method: "post",
       url: "/file/protected/upload",
       data: formData,
+      onUploadProgress(progressEvent) {
+        onProgress(progressEvent, file.name, true, id);
+      },
     });
   }
 
@@ -166,9 +191,11 @@ class FileApi {
    * 上传私有文件
    * @param path
    * @param file
+   * @param onProgress
+   * @param id
    * @returns
    */
-  uploadPrivate(path: string, file: File) {
+  uploadPrivate(path: string, file: File, onProgress: Function, id: string) {
     const formData = new FormData();
     formData.append("path", path);
     formData.append("file", file);
@@ -176,6 +203,9 @@ class FileApi {
       method: "post",
       url: "/file/private/upload",
       data: formData,
+      onUploadProgress(progressEvent) {
+        onProgress(progressEvent, file.name, true, id);
+      },
     });
   }
 
