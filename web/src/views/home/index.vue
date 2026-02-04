@@ -104,7 +104,7 @@ import { formatTime, uuid } from "@/utils";
 import { AxiosProgressEvent } from "axios";
 
 const tokenStore = useTokenStore();
-const { isAdmin, accessToken, publicAuth, protectedAuth, privateAuth } = storeToRefs(tokenStore);
+const { accessToken, publicAuth, protectedAuth, privateAuth } = storeToRefs(tokenStore);
 const currentMenu = ref("public");
 const loading = ref(false);
 const fileList: Ref<FileInfo[]> = ref([]);
@@ -128,9 +128,6 @@ onMounted(() => {
  * 判断是否有更新权限
  */
 const updateAuth = () => {
-  if (isAdmin.value) {
-    return true;
-  }
   if (currentMenu.value === "public" && publicAuth.value) {
     return true;
   }
@@ -197,7 +194,7 @@ const queryFileList = () => {
  */
 const uploadClick = () => {
   Upload.openFiles().then((fileList) => {
-    if (fileList[0].size >= 1000 * 1000 * 1000) {
+    if (fileList[0].size >= 1024 * 1024 * 1024) {
       ElMessage.error("文件大小不可超过1GB");
       return;
     }
