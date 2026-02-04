@@ -8,9 +8,11 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"time"
 
 	"github.com/kataras/golog"
 	"github.com/kataras/iris/v12"
+	"github.com/muesli/cache2go"
 )
 
 // 查询文件列表
@@ -67,6 +69,45 @@ func FileDownload(ctx iris.Context, parentDir, path, fileName string) {
 		// 文件
 		ctx.SendFile(filePath, fileName)
 	}
+}
+
+// 分享文件
+func FileShare(fileShare entity.FileShare) string {
+	if fileShare.ShareHours <= 0 || fileShare.ShareHours > 720 {
+		panic(common.NewError("分享时间最长30天"))
+	}
+
+	// 判断是目录还是文件
+	path := filepath.Clean("/" + fileShare.Path)
+	fileName := filepath.Clean("/" + fileShare.Name)
+	filePath := filepath.Join(common.DataPath, fileShare.ParentDir, path, fileName)
+	isDir, err := util.PathIsDir(filePath)
+	if err != nil {
+		panic(common.NewErr("文件不存在", err))
+	}
+	if isDir {
+		// 目录
+		panic(common.NewError("暂不支持分享目录"))
+	}
+
+	// 缓存分享信息
+	id := util.UUIDNoHyphen()
+	cache2go.Cache(common.FileShareCache).Add(id, time.Hour*time.Duration(fileShare.ShareHours), &fileShare)
+
+	return id
+}
+
+// 下载分享文件
+func FileShareDownload(ctx iris.Context, id string) {
+	// 从缓存取出分享信息
+	res, err := cache2go.Cache(common.FileShareCache).Value(id)
+	if err != nil {
+		panic(common.NewError("分享链接已失效"))
+	}
+	fileShare := res.Data().(*entity.FileShare)
+
+	// 下载
+	FileDownload(ctx, fileShare.ParentDir, fileShare.Path, fileShare.Name)
 }
 
 // 创建目录

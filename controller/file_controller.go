@@ -78,6 +78,48 @@ func FileDownloadPrivate(ctx iris.Context) {
 	service.FileDownload(ctx, common.PrivateDirName, path, fileInfo.Name)
 }
 
+// 分享公开文件
+func FileSharePublic(ctx iris.Context) {
+	fileShare := entity.FileShare{}
+	resolveParam(ctx, &fileShare)
+	fileShare.ParentDir = common.PublicDirName
+	id := service.FileShare(fileShare)
+	ctx.JSON(common.NewSuccessData("已创建分享链接", id))
+}
+
+// 分享保护文件
+func FileShareProtected(ctx iris.Context) {
+	fileShare := entity.FileShare{}
+	resolveParam(ctx, &fileShare)
+	fileShare.ParentDir = common.ProtectedDirName
+	id := service.FileShare(fileShare)
+	ctx.JSON(common.NewSuccessData("已创建分享链接", id))
+}
+
+// 分享私有文件
+func FileSharePrivate(ctx iris.Context) {
+	fileShare := entity.FileShare{}
+	resolveParam(ctx, &fileShare)
+
+	// 管理员可以分享所有人的文件
+	tokenCache := middleware.CurrentUserCache(ctx)
+	var path string
+	if !tokenCache.IsAdmin {
+		path = filepath.Join(tokenCache.Username, fileShare.Path)
+	}
+
+	fileShare.Path = path
+	fileShare.ParentDir = common.PrivateDirName
+	id := service.FileShare(fileShare)
+	ctx.JSON(common.NewSuccessData("已创建分享链接", id))
+}
+
+// 下载分享文件
+func FileShareDownload(ctx iris.Context) {
+	id := ctx.Params().Get("id")
+	service.FileShareDownload(ctx, id)
+}
+
 // 创建公开目录
 func FileFolderPublic(ctx iris.Context) {
 	// 判断用户是否有更新权限

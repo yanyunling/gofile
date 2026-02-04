@@ -1,12 +1,5 @@
 <template>
-  <el-dialog
-    v-model="loginVisible"
-    append-to-body
-    destroy-on-close
-    width="500"
-    :before-close="beforeClose"
-    center
-  >
+  <el-dialog v-model="loginVisible" append-to-body destroy-on-close width="500" :before-close="beforeClose" center>
     <div class="page-login">
       <div class="title-view">登录</div>
       <div class="content-view">
@@ -144,17 +137,21 @@ const captchaGet = () => {
 const captchaConfirm = (point: SlidePoint, reset: () => void) => {
   signInData.value.captchaX = point.x;
   signInData.value.captchaY = point.y;
-  TokenApi.validateCaptcha(signInData.value).then((res) => {
-    // 验证成功
-    if (res.data) {
+  captchaLoading.value = true;
+  TokenApi.validateCaptcha(signInData.value)
+    .then((res) => {
+      // 验证成功
+      if (res.data) {
+        signIn();
+      } else {
+        ElMessage.warning("验证失败");
+        captchaGet();
+      }
+      reset();
+    })
+    .finally(() => {
       captchaVisible.value = false;
-      signIn();
-    } else {
-      ElMessage.warning("验证失败");
-      captchaGet();
-    }
-    reset();
-  });
+    });
 };
 
 /**

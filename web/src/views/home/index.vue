@@ -1,15 +1,15 @@
 <template>
   <div class="page-home" v-loading="loading">
     <div class="left-view">
-      <div class="item-view" :class="currentMenu === 'public' ? 'selected' : ''" @click="changeType('public')">
+      <div class="item-view" :class="parentDir === 'public' ? 'selected' : ''" @click="changeType('public')">
         <el-icon><FolderChecked /></el-icon>
         <span>公开文件</span>
       </div>
-      <div v-if="accessToken" class="item-view" :class="currentMenu === 'protected' ? 'selected' : ''" @click="changeType('protected')">
+      <div v-if="accessToken" class="item-view" :class="parentDir === 'protected' ? 'selected' : ''" @click="changeType('protected')">
         <el-icon><Lock /></el-icon>
         <span>保护文件</span>
       </div>
-      <div v-if="accessToken" class="item-view" :class="currentMenu === 'private' ? 'selected' : ''" @click="changeType('private')">
+      <div v-if="accessToken" class="item-view" :class="parentDir === 'private' ? 'selected' : ''" @click="changeType('private')">
         <el-icon><User /></el-icon>
         <span>个人文件</span>
       </div>
@@ -67,13 +67,20 @@
             </template>
             <template #default="scope">
               <el-button v-if="!scope.row.isDir" type="primary" link size="small" @click="downloadClick(scope.row)">下载</el-button>
+              <el-button v-if="!scope.row.isDir && accessToken" type="success" link size="small" @click="shareClick(scope.row)">分享</el-button>
               <el-button v-if="updateAuth()" type="danger" link size="small" @click="deleteClick(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
       </div>
     </div>
-    <el-drawer v-model="drawerData.visible" :title="drawerData.isUpload ? '文件上传' : '文件下载'" direction="ltr">
+    <el-drawer
+      v-model="drawerData.visible"
+      :title="drawerData.isUpload ? '文件上传' : '文件下载'"
+      direction="ltr"
+      :close-on-press-escape="false"
+      :close-on-click-modal="drawerData.isFinished"
+    >
       <el-descriptions direction="vertical" :column="1" border>
         <el-descriptions-item label="文件名">{{ drawerData.fileName }}</el-descriptions-item>
         <el-descriptions-item label="文件大小">{{ drawerData.total }}</el-descriptions-item>
@@ -93,7 +100,7 @@
 
 <script lang="ts" setup>
 import { ref, Ref, onMounted } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElMessage, ElMessageBox, ElNotification } from "element-plus";
 import FileApi from "@/api/file";
 import { saveAs } from "file-saver";
 import { Upload } from "@/utils/upload";
@@ -103,9 +110,10 @@ import { FolderChecked, Lock, User } from "@element-plus/icons-vue";
 import { formatTime, uuid } from "@/utils";
 import { AxiosProgressEvent } from "axios";
 
+const hostUrl = ref(location.origin);
 const tokenStore = useTokenStore();
 const { accessToken, publicAuth, protectedAuth, privateAuth } = storeToRefs(tokenStore);
-const currentMenu = ref("public");
+const parentDir = ref("public");
 const loading = ref(false);
 const fileList: Ref<FileInfo[]> = ref([]);
 const pathList: Ref<string[]> = ref([]);
@@ -114,6 +122,7 @@ const drawerData = ref({
   id: "",
   fileName: "",
   isUpload: false,
+  isFinished: false,
   finished: "",
   loaded: "",
   total: "",
@@ -128,13 +137,13 @@ onMounted(() => {
  * 判断是否有更新权限
  */
 const updateAuth = () => {
-  if (currentMenu.value === "public" && publicAuth.value) {
+  if (parentDir.value === "public" && publicAuth.value) {
     return true;
   }
-  if (currentMenu.value === "protected" && protectedAuth.value) {
+  if (parentDir.value === "protected" && protectedAuth.value) {
     return true;
   }
-  if (currentMenu.value === "private" && privateAuth.value) {
+  if (parentDir.value === "private" && privateAuth.value) {
     return true;
   }
   return false;
@@ -145,7 +154,7 @@ const updateAuth = () => {
  * @param menu
  */
 const changeType = (menu: string) => {
-  currentMenu.value = menu;
+  parentDir.value = menu;
   pathList.value = [];
   queryFileList();
 };
@@ -177,16 +186,52 @@ const folderClick = (row: FileInfo) => {
  */
 const queryFileList = () => {
   fileList.value = [];
-  const fileFunc =
-    currentMenu.value === "public" ? FileApi.listPublic : currentMenu.value === "protected" ? FileApi.listProtected : FileApi.listPrivate;
   loading.value = true;
-  fileFunc(pathList.value.join("/"))
+  FileApi.list(parentDir.value, pathList.value.join("/"))
     .then((res) => {
       fileList.value = res.data;
     })
     .finally(() => {
       loading.value = false;
     });
+};
+
+/**
+ * 分享文件
+ * @param row
+ */
+const shareClick = (row: FileInfo) => {
+  ElMessageBox.prompt("请输入分享时长(小时)，限制在1-720小时之间", "分享文件", {
+    confirmButtonText: "创建",
+    cancelButtonText: "取消",
+  }).then(({ value }) => {
+    if (!/^[1-9]\d*$/.test(value)) {
+      ElMessage.warning("请输入1-720之间的正整数");
+      return;
+    }
+    let shareHours = parseInt(value);
+    if (shareHours > 720) {
+      ElMessage.warning("请输入1-720之间的正整数");
+      return;
+    }
+    loading.value = true;
+    FileApi.share(parentDir.value, pathList.value.join("/"), row.name, shareHours)
+      .then((res) => {
+        ElNotification({
+          type: "success",
+          title: "文件分享成功",
+          dangerouslyUseHTMLString: true,
+          duration: 0,
+          message: `<div>文件名：${row.name}</div>
+          <div>有效期：${shareHours}小时</div>
+          <div>链接：</div>
+          <div style="color: #3d5eb9">${hostUrl.value}/api/open/file/share/${res.data}</div>`,
+        });
+      })
+      .finally(() => {
+        loading.value = false;
+      });
+  });
 };
 
 /**
@@ -198,20 +243,20 @@ const uploadClick = () => {
       ElMessage.error("文件大小不可超过1GB");
       return;
     }
-    const fileFunc =
-      currentMenu.value === "public" ? FileApi.uploadPublic : currentMenu.value === "protected" ? FileApi.uploadProtected : FileApi.uploadPrivate;
     const id = uuid();
     openDrawer(id);
-    fileFunc(pathList.value.join("/"), fileList[0], onProgress, id)
+    FileApi.upload(parentDir.value, pathList.value.join("/"), fileList[0], onProgress, id)
       .then(() => {
         ElMessage.success("上传成功");
         if (id === drawerData.value.id) {
+          drawerData.value.isFinished = true;
           drawerData.value.finished = "成功";
         }
         queryFileList();
       })
       .catch(() => {
         if (id === drawerData.value.id) {
+          drawerData.value.isFinished = true;
           drawerData.value.finished = "失败";
         }
       });
@@ -223,19 +268,19 @@ const uploadClick = () => {
  */
 const downloadClick = (row: FileInfo) => {
   const fileName = row.name;
-  const fileFunc =
-    currentMenu.value === "public" ? FileApi.downloadPublic : currentMenu.value === "protected" ? FileApi.downloadProtected : FileApi.downloadPrivate;
   const id = uuid();
   openDrawer(id);
-  fileFunc(pathList.value.join("/"), fileName, onProgress, id)
+  FileApi.download(parentDir.value, pathList.value.join("/"), fileName, onProgress, id)
     .then((res) => {
       saveAs(res, fileName);
       if (id === drawerData.value.id) {
+        drawerData.value.isFinished = true;
         drawerData.value.finished = "成功";
       }
     })
     .catch(() => {
       if (id === drawerData.value.id) {
+        drawerData.value.isFinished = true;
         drawerData.value.finished = "失败";
       }
     });
@@ -272,6 +317,7 @@ const onProgress = (progressEvent: AxiosProgressEvent, fileName: string, isUploa
  */
 const openDrawer = (id: string) => {
   drawerData.value.id = id;
+  drawerData.value.isFinished = false;
   drawerData.value.finished = "进行中";
   drawerData.value.isUpload = false;
   drawerData.value.fileName = "";
@@ -289,10 +335,8 @@ const createFolderClick = () => {
     confirmButtonText: "创建",
     cancelButtonText: "取消",
   }).then(({ value }) => {
-    const fileFunc =
-      currentMenu.value === "public" ? FileApi.folderPublic : currentMenu.value === "protected" ? FileApi.folderProtected : FileApi.folderPrivate;
     loading.value = true;
-    fileFunc(pathList.value.join("/"), value)
+    FileApi.folder(parentDir.value, pathList.value.join("/"), value)
       .then((res) => {
         ElMessage.success(res.message);
         queryFileList();
@@ -312,10 +356,8 @@ const deleteClick = (row: FileInfo) => {
     cancelButtonText: "取消",
     type: "warning",
   }).then(() => {
-    const fileFunc =
-      currentMenu.value === "public" ? FileApi.deletePublic : currentMenu.value === "protected" ? FileApi.deleteProtected : FileApi.deletePrivate;
     loading.value = true;
-    fileFunc(pathList.value.join("/"), row.name)
+    FileApi.delete(parentDir.value, pathList.value.join("/"), row.name)
       .then((res) => {
         ElMessage.success(res.message);
         queryFileList();

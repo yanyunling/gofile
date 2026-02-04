@@ -44,16 +44,21 @@ func InitRouter(app *iris.Application) {
 
 			// 文件管理
 			data.PartyFunc("/file", func(file iris.Party) {
+				file.Post("/public/share", FileSharePublic)
 				file.Post("/public/folder", FileFolderPublic)
 				file.Post("/public/upload", FileUploadPublic)
 				file.Post("/public/delete", FileDeletePublic)
+
 				file.Post("/protected/list", FileListProtected)
 				file.Post("/protected/download", FileDownloadProtected)
+				file.Post("/protected/share", FileShareProtected)
 				file.Post("/protected/folder", FileFolderProtected)
 				file.Post("/protected/upload", FileUploadProtected)
 				file.Post("/protected/delete", FileDeleteProtected)
+
 				file.Post("/private/list", FileListPrivate)
 				file.Post("/private/download", FileDownloadPrivate)
+				file.Post("/private/share", FileSharePrivate)
 				file.Post("/private/folder", FileFolderPrivate)
 				file.Post("/private/upload", FileUploadPrivate)
 				file.Post("/private/delete", FileDeletePrivate)
@@ -66,6 +71,7 @@ func InitRouter(app *iris.Application) {
 			open.PartyFunc("/file", func(file iris.Party) {
 				file.Post("/public/list", FileListPublic)
 				file.Post("/public/download", FileDownloadPublic)
+				file.Get("/share/{id}", FileShareDownload)
 			})
 		})
 	})
