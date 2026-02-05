@@ -142,6 +142,7 @@ const captchaConfirm = (point: SlidePoint, reset: () => void) => {
     .then((res) => {
       // 验证成功
       if (res.data) {
+        captchaVisible.value = false;
         signIn();
       } else {
         ElMessage.warning("验证失败");
@@ -150,7 +151,7 @@ const captchaConfirm = (point: SlidePoint, reset: () => void) => {
       reset();
     })
     .finally(() => {
-      captchaVisible.value = false;
+      captchaLoading.value = false;
     });
 };
 
