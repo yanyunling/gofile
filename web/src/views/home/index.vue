@@ -201,66 +201,70 @@ const queryFileList = () => {
  * @param row
  */
 const shareClick = (row: FileInfo) => {
-  ElMessageBox.prompt("请输入分享时长(小时)，限制在1-720小时之间", "分享文件", {
+  ElMessageBox.prompt("请输入分享时长(小时)，最长不超过720小时", "分享文件", {
     confirmButtonText: "创建",
     cancelButtonText: "取消",
-  }).then(({ value }) => {
-    if (!/^[1-9]\d*$/.test(value)) {
-      ElMessage.warning("请输入1-720之间的正整数");
-      return;
-    }
-    let shareHours = parseInt(value);
-    if (shareHours > 720) {
-      ElMessage.warning("请输入1-720之间的正整数");
-      return;
-    }
-    loading.value = true;
-    FileApi.share(parentDir.value, pathList.value.join("/"), row.name, shareHours)
-      .then((res) => {
-        ElNotification({
-          type: "success",
-          title: "文件分享成功",
-          dangerouslyUseHTMLString: true,
-          duration: 0,
-          message: `<div>文件名：${row.name}</div>
+  })
+    .then(({ value }) => {
+      if (!/^[1-9]\d*$/.test(value)) {
+        ElMessage.warning("请输入720以内的正整数");
+        return;
+      }
+      let shareHours = parseInt(value);
+      if (shareHours > 720) {
+        ElMessage.warning("请输入720以内的正整数");
+        return;
+      }
+      loading.value = true;
+      FileApi.share(parentDir.value, pathList.value.join("/"), row.name, shareHours)
+        .then((res) => {
+          ElNotification({
+            type: "success",
+            title: "文件分享成功",
+            dangerouslyUseHTMLString: true,
+            duration: 0,
+            message: `<div>文件名：${row.name}</div>
           <div>有效期：${shareHours}小时</div>
           <div>链接：</div>
           <div style="color: #3d5eb9">${hostUrl.value}/api/open/file/share/${res.data}</div>`,
+          });
+        })
+        .finally(() => {
+          loading.value = false;
         });
-      })
-      .finally(() => {
-        loading.value = false;
-      });
-  });
+    })
+    .catch(() => {});
 };
 
 /**
  * 上传文件
  */
 const uploadClick = () => {
-  Upload.openFiles().then((fileList) => {
-    if (fileList[0].size >= 1024 * 1024 * 1024) {
-      ElMessage.error("文件大小不可超过1GB");
-      return;
-    }
-    const id = uuid();
-    openDrawer(id);
-    FileApi.upload(parentDir.value, pathList.value.join("/"), fileList[0], onProgress, id)
-      .then(() => {
-        ElMessage.success("上传成功");
-        if (id === drawerData.value.id) {
-          drawerData.value.isFinished = true;
-          drawerData.value.finished = "成功";
-        }
-        queryFileList();
-      })
-      .catch(() => {
-        if (id === drawerData.value.id) {
-          drawerData.value.isFinished = true;
-          drawerData.value.finished = "失败";
-        }
-      });
-  });
+  Upload.openFiles()
+    .then((fileList) => {
+      if (fileList[0].size >= 1024 * 1024 * 1024) {
+        ElMessage.error("文件大小不可超过1GB");
+        return;
+      }
+      const id = uuid();
+      openDrawer(id);
+      FileApi.upload(parentDir.value, pathList.value.join("/"), fileList[0], onProgress, id)
+        .then(() => {
+          ElMessage.success("上传成功");
+          if (id === drawerData.value.id) {
+            drawerData.value.isFinished = true;
+            drawerData.value.finished = "成功";
+          }
+          queryFileList();
+        })
+        .catch(() => {
+          if (id === drawerData.value.id) {
+            drawerData.value.isFinished = true;
+            drawerData.value.finished = "失败";
+          }
+        });
+    })
+    .catch(() => {});
 };
 
 /**
@@ -334,17 +338,19 @@ const createFolderClick = () => {
   ElMessageBox.prompt("请输入目录名称", "创建目录", {
     confirmButtonText: "创建",
     cancelButtonText: "取消",
-  }).then(({ value }) => {
-    loading.value = true;
-    FileApi.folder(parentDir.value, pathList.value.join("/"), value)
-      .then((res) => {
-        ElMessage.success(res.message);
-        queryFileList();
-      })
-      .catch(() => {
-        loading.value = false;
-      });
-  });
+  })
+    .then(({ value }) => {
+      loading.value = true;
+      FileApi.folder(parentDir.value, pathList.value.join("/"), value)
+        .then((res) => {
+          ElMessage.success(res.message);
+          queryFileList();
+        })
+        .catch(() => {
+          loading.value = false;
+        });
+    })
+    .catch(() => {});
 };
 
 /**
@@ -355,17 +361,19 @@ const deleteClick = (row: FileInfo) => {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning",
-  }).then(() => {
-    loading.value = true;
-    FileApi.delete(parentDir.value, pathList.value.join("/"), row.name)
-      .then((res) => {
-        ElMessage.success(res.message);
-        queryFileList();
-      })
-      .catch(() => {
-        loading.value = false;
-      });
-  });
+  })
+    .then(() => {
+      loading.value = true;
+      FileApi.delete(parentDir.value, pathList.value.join("/"), row.name)
+        .then((res) => {
+          ElMessage.success(res.message);
+          queryFileList();
+        })
+        .catch(() => {
+          loading.value = false;
+        });
+    })
+    .catch(() => {});
 };
 </script>
 

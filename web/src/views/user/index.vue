@@ -174,17 +174,19 @@ const deleteClick = (row: User) => {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning",
-  }).then(() => {
-    tableLoading.value = true;
-    UserApi.delete(row.id)
-      .then(() => {
-        ElMessage.success("删除成功");
-        queryTableData();
-      })
-      .catch(() => {
-        tableLoading.value = false;
-      });
-  });
+  })
+    .then(() => {
+      tableLoading.value = true;
+      UserApi.delete(row.id)
+        .then(() => {
+          ElMessage.success("删除成功");
+          queryTableData();
+        })
+        .catch(() => {
+          tableLoading.value = false;
+        });
+    })
+    .catch(() => {});
 };
 
 /**
