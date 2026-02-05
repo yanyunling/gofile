@@ -8,7 +8,7 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/kataras/golog v0.1.12
 	github.com/kataras/iris/v12 v12.2.11
-	github.com/muesli/cache2go v0.0.0-20221011235721-518229cd8021
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/wenlng/go-captcha-assets v1.0.7
 	github.com/wenlng/go-captcha/v2 v2.0.4
 	golang.org/x/crypto v0.47.0

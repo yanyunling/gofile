@@ -9,7 +9,6 @@ import (
 	"gofile/util"
 	"time"
 
-	"github.com/muesli/cache2go"
 	"github.com/wenlng/go-captcha/v2/slide"
 )
 
@@ -34,7 +33,7 @@ func SignIn(signIn common.SignIn) common.TokenResult {
 		panic(common.NewError("验证失败"))
 	}
 	// 移除验证码缓存
-	cache2go.Cache(common.CaptchaCache).Delete(signIn.CaptchaId)
+	middleware.Cache.Delete(common.CaptchaCache + signIn.CaptchaId)
 
 	// 根据用户名查询用户
 	userFromDB, err := repository.UserGetByUsername(middleware.Db, signIn.Username)
@@ -81,34 +80,34 @@ func SignIn(signIn common.SignIn) common.TokenResult {
 	tokenCache.PrivateAuth = userFromDB.PrivateAuth
 
 	// 缓存token
-	cache2go.Cache(common.AccessTokenCache).Add(tokenResult.AccessToken, AccessTokenExpire, &tokenCache)
-	cache2go.Cache(common.RefreshTokenCache).Add(tokenResult.RefreshToken, RefreshTokenExpire, &tokenCache)
-	cache2go.Cache(common.SignInTimesCache).Delete(signIn.Username)
+	middleware.Cache.Set(common.AccessTokenCache+tokenResult.AccessToken, &tokenCache, AccessTokenExpire)
+	middleware.Cache.Set(common.RefreshTokenCache+tokenResult.RefreshToken, &tokenCache, RefreshTokenExpire)
+	middleware.Cache.Delete(common.SignInTimesCache + signIn.Username)
 
 	return tokenResult
 }
 
 // 退出登录
 func SignOut(tokenResult common.TokenResult) {
-	res, err := cache2go.Cache(common.RefreshTokenCache).Value(tokenResult.RefreshToken)
-	if err == nil {
-		tokenCache := res.Data().(*common.TokenCache)
+	res, found := middleware.Cache.Get(common.RefreshTokenCache + tokenResult.RefreshToken)
+	if found {
+		tokenCache := res.(*common.TokenCache)
 		if tokenCache.RefreshToken != "" {
-			cache2go.Cache(common.RefreshTokenCache).Delete(tokenCache.RefreshToken)
+			middleware.Cache.Delete(common.RefreshTokenCache + tokenCache.RefreshToken)
 		}
 		if tokenCache.AccessToken != "" {
-			cache2go.Cache(common.AccessTokenCache).Delete(tokenCache.AccessToken)
+			middleware.Cache.Delete(common.AccessTokenCache + tokenCache.AccessToken)
 		}
 	}
 }
 
 // 刷新token
 func TokenRefresh(refreshToken string) common.TokenResult {
-	res, err := cache2go.Cache(common.RefreshTokenCache).Value(refreshToken)
-	if err != nil {
+	res, found := middleware.Cache.Get(common.RefreshTokenCache + refreshToken)
+	if !found {
 		panic(common.NewError("认证信息已过期，请重新登录"))
 	}
-	tokenCache := res.Data().(*common.TokenCache)
+	tokenCache := res.(*common.TokenCache)
 	if tokenCache.RefreshToken == "" {
 		panic(common.NewError("认证信息已过期，请重新登录"))
 	}
@@ -153,8 +152,8 @@ func TokenRefresh(refreshToken string) common.TokenResult {
 	newTokenCache.PrivateAuth = userFromDB.PrivateAuth
 
 	// 缓存token
-	cache2go.Cache(common.AccessTokenCache).Add(newTokenCache.AccessToken, AccessTokenExpire, &newTokenCache)
-	cache2go.Cache(common.RefreshTokenCache).Add(newTokenCache.RefreshToken, RefreshTokenExpire, &newTokenCache)
+	middleware.Cache.Set(common.AccessTokenCache+newTokenCache.AccessToken, &newTokenCache, AccessTokenExpire)
+	middleware.Cache.Set(common.RefreshTokenCache+newTokenCache.RefreshToken, &newTokenCache, RefreshTokenExpire)
 
 	return tokenResult
 }
@@ -163,7 +162,7 @@ func TokenRefresh(refreshToken string) common.TokenResult {
 func Captcha(signIn common.SignIn) middleware.CaptchaResult {
 	// 传入的id是上一次的验证码，此操作为刷新验证码，移除上一次的缓存
 	if signIn.CaptchaId != "" {
-		cache2go.Cache(common.CaptchaCache).Delete(signIn.CaptchaId)
+		middleware.Cache.Delete(common.CaptchaCache + signIn.CaptchaId)
 	}
 
 	// 生成验证码
@@ -175,7 +174,7 @@ func Captcha(signIn common.SignIn) middleware.CaptchaResult {
 
 	// 缓存验证信息
 	captchaCache := middleware.CaptchaCache{X: captchaResult.X, Y: captchaResult.Y}
-	cache2go.Cache(common.CaptchaCache).Add(captchaResult.CaptchaId, CaptchaExpire, &captchaCache)
+	middleware.Cache.Set(common.CaptchaCache+captchaResult.CaptchaId, &captchaCache, CaptchaExpire)
 
 	return captchaResult
 }
@@ -183,18 +182,18 @@ func Captcha(signIn common.SignIn) middleware.CaptchaResult {
 // 校验验证码
 func CaptchaValidate(signIn common.SignIn) bool {
 	// 根据验证码id从缓存获取验证码信息
-	res, err := cache2go.Cache(common.CaptchaCache).Value(signIn.CaptchaId)
-	if err != nil {
+	res, found := middleware.Cache.Get(common.CaptchaCache + signIn.CaptchaId)
+	if !found {
 		return false
 	}
-	captchaCache := res.Data().(*middleware.CaptchaCache)
+	captchaCache := res.(*middleware.CaptchaCache)
 
 	// 校验
 	ok := slide.Validate(signIn.CaptchaX, signIn.CaptchaY, captchaCache.X, captchaCache.Y, 6)
 
 	// 移除验证码缓存
 	if !ok {
-		cache2go.Cache(common.CaptchaCache).Delete(signIn.CaptchaId)
+		middleware.Cache.Delete(common.CaptchaCache + signIn.CaptchaId)
 	}
 
 	return ok
@@ -202,22 +201,16 @@ func CaptchaValidate(signIn common.SignIn) bool {
 
 // 校验登录次数，如已超出则抛出异常
 func checkSignInTimes(name string) {
-	cache := cache2go.Cache(common.SignInTimesCache)
-	signInTimes, err := cache.Value(name)
 	times := 1
-	expireSecond := int64(0)
-	if err != nil {
-		cache.Add(name, time.Minute*5, true)
+	signInTimes, exp, found := middleware.Cache.GetWithExpiration(common.SignInTimesCache + name)
+	now := time.Now()
+	if !found || exp.Before(now) {
+		middleware.Cache.Set(common.SignInTimesCache+name, times, time.Minute*5)
 	} else {
-		expireSecond = 300 - (time.Now().Unix() - signInTimes.CreatedOn().Unix())
-		// 有时过期后缓存不会立即删除，手动重置次数
-		if expireSecond <= 0 {
-			cache.Add(name, time.Minute*5, true)
-		} else {
-			times = int(signInTimes.AccessCount()) + 1
-		}
+		times = signInTimes.(int) + 1
+		middleware.Cache.Set(common.SignInTimesCache+name, times, exp.Sub(now))
 	}
 	if times > 5 {
-		panic(common.NewError(fmt.Sprintf("登录次数已达上限，请于%v分钟后再试", (expireSecond/60 + 1))))
+		panic(common.NewError(fmt.Sprintf("登录次数已达上限，请于%v分钟后再试", int(exp.Sub(now).Minutes())+1)))
 	}
 }

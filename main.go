@@ -51,6 +51,9 @@ func main() {
 	// 全局异常恢复
 	app.Use(middleware.GlobalRecover)
 
+	// 初始化缓存
+	middleware.InitCache()
+
 	// 初始化验证码组件
 	err := middleware.InitCaptcha()
 	if err != nil {

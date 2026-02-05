@@ -1,6 +1,7 @@
 package service
 
 import (
+	"gofile/middleware"
 	"gofile/model/common"
 	"gofile/model/entity"
 	"gofile/util"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/kataras/golog"
 	"github.com/kataras/iris/v12"
-	"github.com/muesli/cache2go"
 )
 
 // 查询文件列表
@@ -92,7 +92,7 @@ func FileShare(fileShare entity.FileShare) string {
 
 	// 缓存分享信息
 	id := util.UUIDNoHyphen()
-	cache2go.Cache(common.FileShareCache).Add(id, time.Hour*time.Duration(fileShare.ShareHours), &fileShare)
+	middleware.Cache.Set(common.FileShareCache+id, &fileShare, time.Hour*time.Duration(fileShare.ShareHours))
 
 	return id
 }
@@ -100,11 +100,11 @@ func FileShare(fileShare entity.FileShare) string {
 // 下载分享文件
 func FileShareDownload(ctx iris.Context, id string) {
 	// 从缓存取出分享信息
-	res, err := cache2go.Cache(common.FileShareCache).Value(id)
-	if err != nil {
+	res, found := middleware.Cache.Get(common.FileShareCache + id)
+	if !found {
 		panic(common.NewError("分享链接已失效"))
 	}
-	fileShare := res.Data().(*entity.FileShare)
+	fileShare := res.(*entity.FileShare)
 
 	// 下载
 	FileDownload(ctx, fileShare.ParentDir, fileShare.Path, fileShare.Name)

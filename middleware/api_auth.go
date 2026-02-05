@@ -10,7 +10,6 @@ import (
 	"unicode/utf8"
 
 	"github.com/kataras/iris/v12"
-	"github.com/muesli/cache2go"
 )
 
 // 数据接口授权
@@ -18,7 +17,8 @@ func DataAuth(ctx iris.Context) {
 	token := resolveHeader(ctx, "Bearer")
 
 	// 检验缓存中是否存在此token
-	if !cache2go.Cache(common.AccessTokenCache).Exists(token) {
+	_, found := Cache.Get(common.AccessTokenCache + token)
+	if !found {
 		panic(common.NewErrorCode(common.HttpAuthFailure, "认证失败"))
 	}
 
@@ -59,11 +59,11 @@ func CurrentUserId(ctx iris.Context) string {
 // 获取当前登录用户缓存信息
 func CurrentUserCache(ctx iris.Context) common.TokenCache {
 	token := resolveHeader(ctx, "Bearer")
-	res, err := cache2go.Cache(common.AccessTokenCache).Value(token)
-	if err != nil {
+	res, found := Cache.Get(common.AccessTokenCache + token)
+	if !found {
 		panic(common.NewErrorCode(common.HttpAuthFailure, "认证失败"))
 	}
-	tokenCache := res.Data().(*common.TokenCache)
+	tokenCache := res.(*common.TokenCache)
 	if tokenCache.UserId == "" {
 		panic(common.NewErrorCode(common.HttpAuthFailure, "认证失败"))
 	}
