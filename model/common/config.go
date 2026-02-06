@@ -9,4 +9,5 @@ var (
 	ProtectedDirName string // 个人的下载目录，登录可见，在数据目录下
 	PublicDirName    string // 公开的下载目录，无需登录，在数据目录下
 	AdminPassword    string // 超级管理员密码
+	DownloadLimitKB  int    // 下载限速(KB)
 )

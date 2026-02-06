@@ -67,7 +67,7 @@ func FileDownload(ctx iris.Context, parentDir, path, fileName string) {
 		panic(common.NewError("暂不支持目录下载"))
 	} else {
 		// 文件
-		ctx.SendFile(filePath, fileName)
+		ctx.SendFileWithRate(filePath, fileName, float64(common.DownloadLimitKB)*iris.KB, 2*common.DownloadLimitKB*iris.KB)
 	}
 }
 

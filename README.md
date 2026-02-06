@@ -43,16 +43,18 @@
 - `-log`：日志目录，存放近 30 天的日志。默认值：**./logs**
 - `-data`：数据目录，存放数据库及文件资源。默认值：**./data**
 - `-pass`：超级管理员密码。默认值：**Admin123**
+- `-limit`：下载限速(KB)。默认值：**10240**
 
 ## docker 部署
 
 > [https://hub.docker.com/r/streamerzero/gofile](https://hub.docker.com/r/streamerzero/gofile)
 
-- 启动命令：`docker run -d --name gofile --restart always -p 9300:9300 -v /etc/localtime:/etc/localtime:ro -v /home/docker/gofile:/gofile/data -e pass="Admin123" streamerzero/gofile`
+- 启动命令：`docker run -d --name gofile --restart always -p 9300:9300 -v /etc/localtime:/etc/localtime:ro -v /home/docker/gofile:/gofile/data -e pass="Admin123" -limit=10240 streamerzero/gofile`
 
 ### 环境变量
 
 - `-pass`：超级管理员密码。默认值：**Admin123**
+- `-limit`：下载限速(KB)。默认值：**10240**
 
 ### 目录
 

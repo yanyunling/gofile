@@ -17,6 +17,7 @@ RUN go build
 FROM alpine:latest
 COPY --from=go /build/gofile/gofile /gofile/
 ENV pass=Admin123
+ENV limit=10240
 EXPOSE 9300
 RUN chmod +x /gofile/gofile
-CMD /gofile/gofile -p 9300 -log /gofile/logs -data /gofile/data -pass=${pass}
+CMD /gofile/gofile -p 9300 -log /gofile/logs -data /gofile/data -pass=${pass} -limit=${limit}
