@@ -44,7 +44,7 @@ func UserResetPassword(ctx iris.Context) {
 func UserUpdatePassword(ctx iris.Context) {
 	userCondition := entity.UserCondition{}
 	resolveParam(ctx, &userCondition)
-	userId := middleware.CurrentUserId(ctx)
+	userId := middleware.CurrentUserCache(ctx).UserId
 	service.UserUpdatePassword(userCondition, userId)
 	ctx.JSON(common.NewSuccess("保存成功"))
 }

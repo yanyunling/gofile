@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/kataras/golog"
@@ -52,7 +53,9 @@ func FileList(parentDir, path string) []entity.FileInfo {
 }
 
 // 下载文件
-func FileDownload(ctx iris.Context, parentDir, path, fileName string) {
+func FileDownload(ctx iris.Context, parentDir, path, fileName, username string) {
+	start := time.Now()
+
 	// 判断是目录还是文件
 	path = filepath.Clean("/" + path)
 	fileName = filepath.Clean("/" + fileName)
@@ -68,11 +71,14 @@ func FileDownload(ctx iris.Context, parentDir, path, fileName string) {
 	} else {
 		// 文件
 		ctx.SendFileWithRate(filePath, fileName, float64(common.DownloadLimitKB)*iris.KB, 2*common.DownloadLimitKB*iris.KB)
+
+		elapsed := time.Since(start)
+		golog.Info("[下载文件][" + username + "][" + strconv.FormatFloat(elapsed.Seconds(), 'f', 2, 64) + "秒] " + filePath)
 	}
 }
 
 // 分享文件
-func FileShare(fileShare entity.FileShare) string {
+func FileShare(fileShare entity.FileShare, username string) string {
 	if fileShare.ShareHours <= 0 || fileShare.ShareHours > 720 {
 		panic(common.NewError("分享时间最长30天"))
 	}
@@ -94,6 +100,8 @@ func FileShare(fileShare entity.FileShare) string {
 	id := util.UUIDNoHyphen()
 	middleware.Cache.Set(common.FileShareCache+id, &fileShare, time.Hour*time.Duration(fileShare.ShareHours))
 
+	golog.Info("[分享文件][" + username + "][" + strconv.Itoa(fileShare.ShareHours) + "小时] " + filePath)
+
 	return id
 }
 
@@ -107,11 +115,11 @@ func FileShareDownload(ctx iris.Context, id string) {
 	fileShare := res.(*entity.FileShare)
 
 	// 下载
-	FileDownload(ctx, fileShare.ParentDir, fileShare.Path, fileShare.Name)
+	FileDownload(ctx, fileShare.ParentDir, fileShare.Path, fileShare.Name, "")
 }
 
 // 创建目录
-func FileFolder(parentDir, path, fileName string) {
+func FileFolder(parentDir, path, fileName, username string) {
 	// 判断目录是否存在
 	path = filepath.Clean("/" + path)
 	fileName = filepath.Clean("/" + fileName)
@@ -126,10 +134,14 @@ func FileFolder(parentDir, path, fileName string) {
 	if err != nil {
 		panic(common.NewErr("目录创建失败", err))
 	}
+
+	golog.Info("[创建目录[" + username + "] " + filePath)
 }
 
 // 上传文件
-func FileUpload(ctx iris.Context, parentDir string) {
+func FileUpload(ctx iris.Context, parentDir, username string) {
+	start := time.Now()
+
 	// 设置最大上传大小1GB
 	ctx.SetMaxRequestBodySize(1 << 30)
 
@@ -162,14 +174,20 @@ func FileUpload(ctx iris.Context, parentDir string) {
 		os.RemoveAll(filePath)
 		panic(common.NewErr("文件保存失败", err))
 	}
+
+	elapsed := time.Since(start)
+	golog.Info("[上传文件][" + username + "][" + strconv.FormatFloat(elapsed.Seconds(), 'f', 2, 64) + "秒] " + filePath)
 }
 
 // 删除文件
-func FileDelete(parentDir, path, fileName string) {
+func FileDelete(parentDir, path, fileName, username string) {
 	path = filepath.Clean("/" + path)
 	fileName = filepath.Clean("/" + fileName)
-	err := os.RemoveAll(filepath.Join(common.DataPath, parentDir, path, fileName))
+	filePath := filepath.Join(common.DataPath, parentDir, path, fileName)
+	err := os.RemoveAll(filePath)
 	if err != nil {
 		panic(common.NewErr("文件删除失败", err))
 	}
+
+	golog.Info("[删除文件][" + username + "] " + filePath)
 }

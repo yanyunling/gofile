@@ -15,6 +15,7 @@ import (
 func FileListPublic(ctx iris.Context) {
 	fileInfo := entity.FileInfo{}
 	resolveParam(ctx, &fileInfo)
+
 	result := service.FileList(common.PublicDirName, fileInfo.Path)
 	ctx.JSON(common.NewSuccessData("查询成功", result))
 }
@@ -23,6 +24,7 @@ func FileListPublic(ctx iris.Context) {
 func FileListProtected(ctx iris.Context) {
 	fileInfo := entity.FileInfo{}
 	resolveParam(ctx, &fileInfo)
+
 	result := service.FileList(common.ProtectedDirName, fileInfo.Path)
 	ctx.JSON(common.NewSuccessData("查询成功", result))
 }
@@ -51,14 +53,17 @@ func FileListPrivate(ctx iris.Context) {
 func FileDownloadPublic(ctx iris.Context) {
 	fileInfo := entity.FileInfo{}
 	resolveParam(ctx, &fileInfo)
-	service.FileDownload(ctx, common.PublicDirName, fileInfo.Path, fileInfo.Name)
+
+	service.FileDownload(ctx, common.PublicDirName, fileInfo.Path, fileInfo.Name, "")
 }
 
 // 下载保护文件
 func FileDownloadProtected(ctx iris.Context) {
 	fileInfo := entity.FileInfo{}
 	resolveParam(ctx, &fileInfo)
-	service.FileDownload(ctx, common.ProtectedDirName, fileInfo.Path, fileInfo.Name)
+	tokenCache := middleware.CurrentUserCache(ctx)
+
+	service.FileDownload(ctx, common.ProtectedDirName, fileInfo.Path, fileInfo.Name, tokenCache.Username)
 }
 
 // 下载私有文件
@@ -75,7 +80,7 @@ func FileDownloadPrivate(ctx iris.Context) {
 		path = filepath.Join(tokenCache.Username, fileInfo.Path)
 	}
 
-	service.FileDownload(ctx, common.PrivateDirName, path, fileInfo.Name)
+	service.FileDownload(ctx, common.PrivateDirName, path, fileInfo.Name, tokenCache.Username)
 }
 
 // 分享公开文件
@@ -83,7 +88,9 @@ func FileSharePublic(ctx iris.Context) {
 	fileShare := entity.FileShare{}
 	resolveParam(ctx, &fileShare)
 	fileShare.ParentDir = common.PublicDirName
-	id := service.FileShare(fileShare)
+	tokenCache := middleware.CurrentUserCache(ctx)
+
+	id := service.FileShare(fileShare, tokenCache.Username)
 	ctx.JSON(common.NewSuccessData("已创建分享链接", id))
 }
 
@@ -92,7 +99,9 @@ func FileShareProtected(ctx iris.Context) {
 	fileShare := entity.FileShare{}
 	resolveParam(ctx, &fileShare)
 	fileShare.ParentDir = common.ProtectedDirName
-	id := service.FileShare(fileShare)
+	tokenCache := middleware.CurrentUserCache(ctx)
+
+	id := service.FileShare(fileShare, tokenCache.Username)
 	ctx.JSON(common.NewSuccessData("已创建分享链接", id))
 }
 
@@ -107,10 +116,10 @@ func FileSharePrivate(ctx iris.Context) {
 	if !tokenCache.IsAdmin {
 		path = filepath.Join(tokenCache.Username, fileShare.Path)
 	}
-
 	fileShare.Path = path
 	fileShare.ParentDir = common.PrivateDirName
-	id := service.FileShare(fileShare)
+
+	id := service.FileShare(fileShare, tokenCache.Username)
 	ctx.JSON(common.NewSuccessData("已创建分享链接", id))
 }
 
@@ -122,29 +131,31 @@ func FileShareDownload(ctx iris.Context) {
 
 // 创建公开目录
 func FileFolderPublic(ctx iris.Context) {
+	fileInfo := entity.FileInfo{}
+	resolveParam(ctx, &fileInfo)
+
 	// 判断用户是否有更新权限
 	tokenCache := middleware.CurrentUserCache(ctx)
 	if !tokenCache.IsAdmin && tokenCache.PublicAuth != 1 {
 		panic(common.NewError("无权限操作"))
 	}
 
-	fileInfo := entity.FileInfo{}
-	resolveParam(ctx, &fileInfo)
-	service.FileFolder(common.PublicDirName, fileInfo.Path, fileInfo.Name)
+	service.FileFolder(common.PublicDirName, fileInfo.Path, fileInfo.Name, tokenCache.Username)
 	ctx.JSON(common.NewSuccess("创建成功"))
 }
 
 // 创建保护目录
 func FileFolderProtected(ctx iris.Context) {
+	fileInfo := entity.FileInfo{}
+	resolveParam(ctx, &fileInfo)
+
 	// 判断用户是否有更新权限
 	tokenCache := middleware.CurrentUserCache(ctx)
 	if !tokenCache.IsAdmin && tokenCache.ProtectedAuth != 1 {
 		panic(common.NewError("无权限操作"))
 	}
 
-	fileInfo := entity.FileInfo{}
-	resolveParam(ctx, &fileInfo)
-	service.FileFolder(common.ProtectedDirName, fileInfo.Path, fileInfo.Name)
+	service.FileFolder(common.ProtectedDirName, fileInfo.Path, fileInfo.Name, tokenCache.Username)
 	ctx.JSON(common.NewSuccess("创建成功"))
 }
 
@@ -166,7 +177,7 @@ func FileFolderPrivate(ctx iris.Context) {
 		path = filepath.Join(common.PrivateDirName, tokenCache.Username)
 	}
 
-	service.FileFolder(path, fileInfo.Path, fileInfo.Name)
+	service.FileFolder(path, fileInfo.Path, fileInfo.Name, tokenCache.Username)
 	ctx.JSON(common.NewSuccess("创建成功"))
 }
 
@@ -178,7 +189,7 @@ func FileUploadPublic(ctx iris.Context) {
 		panic(common.NewError("无权限操作"))
 	}
 
-	service.FileUpload(ctx, common.PublicDirName)
+	service.FileUpload(ctx, common.PublicDirName, tokenCache.Username)
 	ctx.JSON(common.NewSuccess("上传成功"))
 }
 
@@ -190,7 +201,7 @@ func FileUploadProtected(ctx iris.Context) {
 		panic(common.NewError("无权限操作"))
 	}
 
-	service.FileUpload(ctx, common.ProtectedDirName)
+	service.FileUpload(ctx, common.ProtectedDirName, tokenCache.Username)
 	ctx.JSON(common.NewSuccess("上传成功"))
 }
 
@@ -209,35 +220,37 @@ func FileUploadPrivate(ctx iris.Context) {
 		path = filepath.Join(common.PrivateDirName, tokenCache.Username)
 	}
 
-	service.FileUpload(ctx, path)
+	service.FileUpload(ctx, path, tokenCache.Username)
 	ctx.JSON(common.NewSuccess("上传成功"))
 }
 
 // 删除公开文件
 func FileDeletePublic(ctx iris.Context) {
+	fileInfo := entity.FileInfo{}
+	resolveParam(ctx, &fileInfo)
+
 	// 判断用户是否有更新权限
 	tokenCache := middleware.CurrentUserCache(ctx)
 	if !tokenCache.IsAdmin && tokenCache.PublicAuth != 1 {
 		panic(common.NewError("无权限操作"))
 	}
 
-	fileInfo := entity.FileInfo{}
-	resolveParam(ctx, &fileInfo)
-	service.FileDelete(common.PublicDirName, fileInfo.Path, fileInfo.Name)
+	service.FileDelete(common.PublicDirName, fileInfo.Path, fileInfo.Name, tokenCache.Username)
 	ctx.JSON(common.NewSuccess("删除成功"))
 }
 
 // 删除保护文件
 func FileDeleteProtected(ctx iris.Context) {
+	fileInfo := entity.FileInfo{}
+	resolveParam(ctx, &fileInfo)
+
 	// 判断用户是否有更新权限
 	tokenCache := middleware.CurrentUserCache(ctx)
 	if !tokenCache.IsAdmin && tokenCache.ProtectedAuth != 1 {
 		panic(common.NewError("无权限操作"))
 	}
 
-	fileInfo := entity.FileInfo{}
-	resolveParam(ctx, &fileInfo)
-	service.FileDelete(common.ProtectedDirName, fileInfo.Path, fileInfo.Name)
+	service.FileDelete(common.ProtectedDirName, fileInfo.Path, fileInfo.Name, tokenCache.Username)
 	ctx.JSON(common.NewSuccess("删除成功"))
 }
 
@@ -259,6 +272,6 @@ func FileDeletePrivate(ctx iris.Context) {
 		path = filepath.Join(common.PrivateDirName, tokenCache.Username)
 	}
 
-	service.FileDelete(path, fileInfo.Path, fileInfo.Name)
+	service.FileDelete(path, fileInfo.Path, fileInfo.Name, tokenCache.Username)
 	ctx.JSON(common.NewSuccess("删除成功"))
 }

@@ -27,7 +27,7 @@ func DataAuth(ctx iris.Context) {
 
 // 管理员接口授权
 func AdminAuth(ctx iris.Context) {
-	if entity.GetAdminUser().Id != CurrentUserId(ctx) {
+	if entity.GetAdminUser().Id != CurrentUserCache(ctx).UserId {
 		panic(common.NewErrorCode(common.HttpFailure, "无权限操作"))
 	}
 
@@ -49,11 +49,6 @@ func TokenAuth(ctx iris.Context) {
 	}
 
 	ctx.Next()
-}
-
-// 获取当前登录用户id
-func CurrentUserId(ctx iris.Context) string {
-	return CurrentUserCache(ctx).UserId
 }
 
 // 获取当前登录用户缓存信息
