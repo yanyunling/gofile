@@ -112,11 +112,9 @@ func FileSharePrivate(ctx iris.Context) {
 
 	// 管理员可以分享所有人的文件
 	tokenCache := middleware.CurrentUserCache(ctx)
-	var path string
 	if !tokenCache.IsAdmin {
-		path = filepath.Join(tokenCache.Username, fileShare.Path)
+		fileShare.Path = filepath.Join(tokenCache.Username, fileShare.Path)
 	}
-	fileShare.Path = path
 	fileShare.ParentDir = common.PrivateDirName
 
 	id := service.FileShare(fileShare, tokenCache.Username)

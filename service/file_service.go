@@ -80,7 +80,7 @@ func FileDownload(ctx iris.Context, parentDir, path, fileName, username string) 
 // 分享文件
 func FileShare(fileShare entity.FileShare, username string) string {
 	if fileShare.ShareHours <= 0 || fileShare.ShareHours > 720 {
-		panic(common.NewError("分享时间最长30天"))
+		panic(common.NewError("分享时间最长720小时"))
 	}
 
 	// 判断是目录还是文件
