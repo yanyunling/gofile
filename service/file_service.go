@@ -72,8 +72,10 @@ func FileDownload(ctx iris.Context, parentDir, path, fileName, username string) 
 		// 文件
 		ctx.SendFileWithRate(filePath, fileName, float64(common.DownloadLimitKB)*iris.KB, 2*common.DownloadLimitKB*iris.KB)
 
-		elapsed := time.Since(start)
-		golog.Info("[下载文件][" + username + "][" + strconv.FormatFloat(elapsed.Seconds(), 'f', 2, 64) + "秒] " + filePath)
+		// 添加日志
+		logFilePath := filepath.Join(parentDir, path, fileName)
+		content := "用时：" + strconv.FormatFloat(time.Since(start).Seconds(), 'f', 2, 64) + "秒，路径：" + logFilePath
+		LogAdd(entity.Info, "下载文件", content, username)
 	}
 }
 
@@ -100,7 +102,10 @@ func FileShare(fileShare entity.FileShare, username string) string {
 	id := util.UUIDNoHyphen()
 	middleware.Cache.Set(common.FileShareCache+id, &fileShare, time.Hour*time.Duration(fileShare.ShareHours))
 
-	golog.Info("[分享文件][" + username + "][" + strconv.Itoa(fileShare.ShareHours) + "小时] " + filePath)
+	// 添加日志
+	logFilePath := filepath.Join(fileShare.ParentDir, path, fileName)
+	content := "时长：" + strconv.Itoa(fileShare.ShareHours) + "小时，链接：" + id + "，路径：" + logFilePath
+	LogAdd(entity.Info, "分享文件", content, username)
 
 	return id
 }
@@ -135,7 +140,10 @@ func FileFolder(parentDir, path, fileName, username string) {
 		panic(common.NewErr("目录创建失败", err))
 	}
 
-	golog.Info("[创建目录[" + username + "] " + filePath)
+	// 添加日志
+	logFilePath := filepath.Join(parentDir, path, fileName)
+	content := "路径：" + logFilePath
+	LogAdd(entity.Info, "创建目录", content, username)
 }
 
 // 上传文件
@@ -175,8 +183,10 @@ func FileUpload(ctx iris.Context, parentDir, username string) {
 		panic(common.NewErr("文件保存失败", err))
 	}
 
-	elapsed := time.Since(start)
-	golog.Info("[上传文件][" + username + "][" + strconv.FormatFloat(elapsed.Seconds(), 'f', 2, 64) + "秒] " + filePath)
+	// 添加日志
+	logFilePath := filepath.Join(parentDir, path, fileHeader.Filename)
+	content := "用时：" + strconv.FormatFloat(time.Since(start).Seconds(), 'f', 2, 64) + "秒，路径：" + logFilePath
+	LogAdd(entity.Info, "上传文件", content, username)
 }
 
 // 删除文件
@@ -189,5 +199,8 @@ func FileDelete(parentDir, path, fileName, username string) {
 		panic(common.NewErr("文件删除失败", err))
 	}
 
-	golog.Info("[删除文件][" + username + "] " + filePath)
+	// 添加日志
+	logFilePath := filepath.Join(parentDir, path, fileName)
+	content := "路径：" + logFilePath
+	LogAdd(entity.Info, "删除文件", content, username)
 }

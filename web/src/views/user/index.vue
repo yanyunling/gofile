@@ -14,7 +14,7 @@
         <el-input class="filter-input" v-model="tableCondition.condition" placeholder="全局搜索" clearable></el-input>
         <el-button type="primary" :icon="Search" @click="tablePageCurrentChange(1)" :loading="tableLoading">查询</el-button>
       </div>
-      <el-table class="table-view" ref="tableRef" :data="tableData" height="100%" stripe border v-loading="tableLoading">
+      <el-table class="table-view" ref="tableRef" :data="tableData" height="100%" stripe border size="small" v-loading="tableLoading">
         <el-table-column prop="" label="序号" align="center" width="60">
           <template #default="scope">
             {{ (tableCondition.page.current - 1) * tableCondition.page.size + scope.$index + 1 }}
@@ -95,7 +95,7 @@ const tableLoading = ref(false);
 const tableCondition: Ref<PageCondition<string>> = ref({
   page: {
     current: 1,
-    size: 10,
+    size: 100,
   },
   condition: "",
 });

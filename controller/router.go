@@ -42,6 +42,11 @@ func InitRouter(app *iris.Application) {
 				user.Post("/reset-password", UserResetPassword)
 			})
 
+			// 操作日志
+			data.PartyFunc("/log", func(log iris.Party) {
+				log.Post("/page", LogPage)
+			})
+
 			// 文件管理
 			data.PartyFunc("/file", func(file iris.Party) {
 				file.Post("/public/share", FileSharePublic)

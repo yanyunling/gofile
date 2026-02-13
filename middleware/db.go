@@ -25,6 +25,28 @@ CREATE TABLE IF NOT EXISTS t_user
 	private_auth int NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS t_log
+(
+	id varchar(36) PRIMARY KEY NOT NULL,
+	title text NOT NULL,
+	content text NOT NULL,
+	level text NOT NULL,
+	username text NOT NULL,
+	create_time bigint NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS t_share
+(
+	id varchar(36) PRIMARY KEY NOT NULL,
+	parent_dir text NOT NULL,
+	path text NOT NULL,
+	name text NOT NULL,
+	username text NOT NULL,
+	share_hours int NOT NULL,
+	start_time bigint NOT NULL,
+	end_time bigint NOT NULL
+);
+
 CREATE UNIQUE INDEX IF NOT EXISTS "user_username"
 ON "t_user" (
   "username" ASC
@@ -47,13 +69,12 @@ func InitDB() error {
 		golog.Error("VACUUM执行失败：", err)
 	}
 
-	// 只有用户管理操作数据库，暂时无需开启WAL模式
 	// 开启WAL模式
-	// _, err = Db.Exec("PRAGMA journal_mode=WAL;")
-	// if err != nil {
-	// 	golog.Error("开启sqlite WAL模式失败：", err)
-	// 	return err
-	// }
+	_, err = Db.Exec("PRAGMA journal_mode=WAL;")
+	if err != nil {
+		golog.Error("开启sqlite WAL模式失败：", err)
+		return err
+	}
 
 	golog.Info("已连接sqlite")
 

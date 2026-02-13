@@ -109,8 +109,10 @@ import { storeToRefs } from "pinia";
 import { FolderChecked, Lock, User } from "@element-plus/icons-vue";
 import { formatTime, uuid } from "@/utils";
 import { AxiosProgressEvent } from "axios";
+import { host, context } from "@/config";
 
-const hostUrl = ref(location.origin);
+const hostUrl = process.env.NODE_ENV === "production" ? location.origin : host;
+const shareUrl = ref(`${hostUrl}${context}/open/file/share/`);
 const tokenStore = useTokenStore();
 const { accessToken, publicAuth, protectedAuth, privateAuth } = storeToRefs(tokenStore);
 const parentDir = ref("public");
@@ -226,7 +228,7 @@ const shareClick = (row: FileInfo) => {
             message: `<div>文件名：${row.name}</div>
           <div>有效期：${shareHours}小时</div>
           <div>链接：</div>
-          <div style="color: #3d5eb9">${hostUrl.value}/api/open/file/share/${res.data}</div>`,
+          <div style="color: #3d5eb9">${shareUrl.value}${res.data}</div>`,
           });
         })
         .finally(() => {
