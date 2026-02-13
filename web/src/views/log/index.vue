@@ -10,9 +10,7 @@
     :before-close="beforeClose"
   >
     <div class="page-log">
-      <div class="filter-view">
-        <el-button type="primary" :icon="Filter" @click="drawerVisible = true" :loading="tableLoading">条件查询</el-button>
-      </div>
+      <el-button class="filter-button" type="primary" :icon="Filter" @click="drawerVisible = true" :loading="tableLoading">条件查询</el-button>
       <el-table class="table-view" ref="tableRef" :data="tableData" height="100%" stripe border size="small" v-loading="tableLoading">
         <el-table-column prop="" label="序号" align="center" width="60">
           <template #default="scope">
@@ -215,12 +213,9 @@ const levelToTag = (level: string) => {
   right: 0;
   top: 50px;
   bottom: 0;
-  .filter-view {
-    max-width: 100%;
+  .filter-button {
     margin: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin-left: -20px;
   }
   .table-view {
     .el-scrollbar__wrap {
@@ -243,6 +238,7 @@ const levelToTag = (level: string) => {
   }
   .search-button {
     margin-top: 10px;
+    margin-left: -25px;
   }
 }
 </style>

@@ -3,6 +3,8 @@ package middleware
 import (
 	"gofile/model/common"
 	"path/filepath"
+	"strconv"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/kataras/golog"
@@ -53,6 +55,11 @@ ON "t_user" (
 );
 `
 
+type pragma struct {
+	PageCount     int64 `json:"pageCount" db:"page_count"`
+	FreelistCount int64 `json:"freelistCount" db:"freelist_count"`
+}
+
 // 初始化数据库连接
 func InitDB() error {
 	// 开启数据库文件
@@ -63,12 +70,6 @@ func InitDB() error {
 		return err
 	}
 
-	// 执行VACUUM优化数据库碎片
-	_, err = Db.Exec("VACUUM;")
-	if err != nil {
-		golog.Error("VACUUM执行失败：", err)
-	}
-
 	// 开启WAL模式
 	_, err = Db.Exec("PRAGMA journal_mode=WAL;")
 	if err != nil {
@@ -76,10 +77,74 @@ func InitDB() error {
 		return err
 	}
 
-	golog.Info("已连接sqlite")
-
 	// 创建表结构
 	Db.MustExec(createTableSql)
 
+	// 数据库定时任务
+	go dbTask()
+
 	return nil
+}
+
+// 数据库定时任务
+func dbTask() {
+	// 每10分钟执行一次
+	ticker := time.NewTicker(10 * time.Minute)
+	defer ticker.Stop()
+	for range ticker.C {
+
+		// 清空日志表
+		logClear()
+
+		// 回收数据库空间
+		vaccum()
+	}
+}
+
+// 执行VACUUM回收空间
+func vaccum() {
+	// 查询总页数
+	p1 := pragma{}
+	err := Db.Get(&p1, "PRAGMA page_count;")
+	if err != nil {
+		golog.Error("[定时任务][VACUUM 回收数据库空间] PRAGMA page_count 执行失败", err)
+		return
+	}
+
+	// 查询空闲页数量
+	p2 := pragma{}
+	err = Db.Get(&p2, "PRAGMA freelist_count;")
+	if err != nil {
+		golog.Error("[定时任务][VACUUM 回收数据库空间] PRAGMA freelist_count 执行失败", err)
+		return
+	}
+
+	// 计算空闲页占比，超过30%则回收空间
+	pageCount := p1.PageCount
+	freelistCount := p2.FreelistCount
+	if pageCount == 0 {
+		return
+	}
+	ratio := float64(freelistCount) * 100.0 / float64(pageCount)
+	if ratio > 30 {
+		// 回收空闲空间
+		_, err = Db.Exec("VACUUM;")
+		if err != nil {
+			golog.Error("[定时任务][VACUUM 回收数据库空间] 执行失败", err)
+		} else {
+			golog.Info("[定时任务][VACUUM 回收数据库空间] 执行成功，总页数：" + strconv.FormatInt(pageCount, 10) + "，空闲页数：" + strconv.FormatInt(freelistCount, 10))
+		}
+	}
+
+}
+
+// 清空超过100万行的日志记录，每次执行删除1万行
+func logClear() {
+	sql := `DELETE FROM t_log WHERE id IN (SELECT id FROM t_log ORDER BY id LIMIT 10000) AND EXISTS (SELECT 1 FROM t_log ORDER BY id LIMIT 1 OFFSET 1000000);`
+	_, err := Db.Exec(sql)
+	if err != nil {
+		golog.Error("[定时任务][清空日志表] 执行失败", err)
+	} else {
+		golog.Info("[定时任务][清空日志表] 执行成功")
+	}
 }
