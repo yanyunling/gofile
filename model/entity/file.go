@@ -7,10 +7,3 @@ type FileInfo struct {
 	UpdateTime int64  `json:"updateTime"`
 	IsDir      bool   `json:"isDir"`
 }
-
-type FileShare struct {
-	ParentDir  string `json:"parentDir"`
-	Path       string `json:"path"`
-	Name       string `json:"name"`
-	ShareHours int    `json:"shareHours"`
-}

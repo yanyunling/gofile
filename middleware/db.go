@@ -92,8 +92,10 @@ func dbTask() {
 	ticker := time.NewTicker(10 * time.Minute)
 	defer ticker.Stop()
 	for range ticker.C {
+		// 清理分享表
+		shareClear()
 
-		// 清空日志表
+		// 清理日志表
 		logClear()
 
 		// 回收数据库空间
@@ -138,13 +140,31 @@ func vaccum() {
 
 }
 
-// 清空超过100万行的日志记录，每次执行删除1万行
+// 清理超过100万行的日志记录，每次执行删除1万行
 func logClear() {
 	sql := `DELETE FROM t_log WHERE id IN (SELECT id FROM t_log ORDER BY id LIMIT 10000) AND EXISTS (SELECT 1 FROM t_log ORDER BY id LIMIT 1 OFFSET 1000000);`
-	_, err := Db.Exec(sql)
+	result, err := Db.Exec(sql)
 	if err != nil {
-		golog.Error("[定时任务][清空日志表] 执行失败", err)
+		golog.Error("[定时任务][清理日志表] 执行失败", err)
 	} else {
-		golog.Info("[定时任务][清空日志表] 执行成功")
+		count, err := result.RowsAffected()
+		if err == nil && count > 0 {
+			golog.Info("[定时任务][清理日志表] 执行成功")
+		}
+	}
+}
+
+// 清理过期的分享记录
+func shareClear() {
+	currentTime := time.Now().UnixMilli()
+	sql := `DELETE FROM t_share WHERE end_time<$1`
+	result, err := Db.Exec(sql, currentTime)
+	if err != nil {
+		golog.Error("[定时任务][清理分享表] 执行失败", err)
+	} else {
+		count, err := result.RowsAffected()
+		if err == nil && count > 0 {
+			golog.Info("[定时任务][清理分享表] 执行成功，清理行数：" + strconv.FormatInt(count, 10))
+		}
 	}
 }

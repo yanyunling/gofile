@@ -1,7 +1,6 @@
 package service
 
 import (
-	"gofile/middleware"
 	"gofile/model/common"
 	"gofile/model/entity"
 	"gofile/util"
@@ -80,15 +79,11 @@ func FileDownload(ctx iris.Context, parentDir, path, fileName, username string) 
 }
 
 // 分享文件
-func FileShare(fileShare entity.FileShare, username string) string {
-	if fileShare.ShareHours <= 0 || fileShare.ShareHours > 720 {
-		panic(common.NewError("分享时间最长720小时"))
-	}
-
+func FileShare(share entity.Share, username string) string {
 	// 判断是目录还是文件
-	path := filepath.Clean("/" + fileShare.Path)
-	fileName := filepath.Clean("/" + fileShare.Name)
-	filePath := filepath.Join(common.DataPath, fileShare.ParentDir, path, fileName)
+	path := filepath.Clean("/" + share.Path)
+	fileName := filepath.Clean("/" + share.Name)
+	filePath := filepath.Join(common.DataPath, share.ParentDir, path, fileName)
 	isDir, err := util.PathIsDir(filePath)
 	if err != nil {
 		panic(common.NewErr("文件不存在", err))
@@ -98,13 +93,13 @@ func FileShare(fileShare entity.FileShare, username string) string {
 		panic(common.NewError("暂不支持分享目录"))
 	}
 
-	// 缓存分享信息
-	id := util.UUIDNoHyphen()
-	middleware.Cache.Set(common.FileShareCache+id, &fileShare, time.Hour*time.Duration(fileShare.ShareHours))
+	// 保存分享信息
+	share.Username = username
+	id := ShareAdd(share)
 
 	// 添加日志
-	logFilePath := filepath.Join(fileShare.ParentDir, path, fileName)
-	content := "时长：" + strconv.Itoa(fileShare.ShareHours) + "小时，链接：" + id + "，路径：" + logFilePath
+	logFilePath := filepath.Join(share.ParentDir, path, fileName)
+	content := "时长：" + strconv.Itoa(share.ShareHours) + "小时，链接：" + id + "，路径：" + logFilePath
 	LogAdd(entity.Info, "分享文件", content, username)
 
 	return id
@@ -112,15 +107,11 @@ func FileShare(fileShare entity.FileShare, username string) string {
 
 // 下载分享文件
 func FileShareDownload(ctx iris.Context, id string) {
-	// 从缓存取出分享信息
-	res, found := middleware.Cache.Get(common.FileShareCache + id)
-	if !found {
-		panic(common.NewError("分享链接已失效"))
-	}
-	fileShare := res.(*entity.FileShare)
+	// 查询分享记录
+	share := ShareGet(id)
 
 	// 下载
-	FileDownload(ctx, fileShare.ParentDir, fileShare.Path, fileShare.Name, "")
+	FileDownload(ctx, share.ParentDir, share.Path, share.Name, "")
 }
 
 // 创建目录

@@ -85,39 +85,39 @@ func FileDownloadPrivate(ctx iris.Context) {
 
 // 分享公开文件
 func FileSharePublic(ctx iris.Context) {
-	fileShare := entity.FileShare{}
-	resolveParam(ctx, &fileShare)
-	fileShare.ParentDir = common.PublicDirName
+	share := entity.Share{}
+	resolveParam(ctx, &share)
+	share.ParentDir = common.PublicDirName
 	tokenCache := middleware.CurrentUserCache(ctx)
 
-	id := service.FileShare(fileShare, tokenCache.Username)
+	id := service.FileShare(share, tokenCache.Username)
 	ctx.JSON(common.NewSuccessData("已创建分享链接", id))
 }
 
 // 分享保护文件
 func FileShareProtected(ctx iris.Context) {
-	fileShare := entity.FileShare{}
-	resolveParam(ctx, &fileShare)
-	fileShare.ParentDir = common.ProtectedDirName
+	share := entity.Share{}
+	resolveParam(ctx, &share)
+	share.ParentDir = common.ProtectedDirName
 	tokenCache := middleware.CurrentUserCache(ctx)
 
-	id := service.FileShare(fileShare, tokenCache.Username)
+	id := service.FileShare(share, tokenCache.Username)
 	ctx.JSON(common.NewSuccessData("已创建分享链接", id))
 }
 
 // 分享私有文件
 func FileSharePrivate(ctx iris.Context) {
-	fileShare := entity.FileShare{}
-	resolveParam(ctx, &fileShare)
+	share := entity.Share{}
+	resolveParam(ctx, &share)
 
 	// 管理员可以分享所有人的文件
 	tokenCache := middleware.CurrentUserCache(ctx)
 	if !tokenCache.IsAdmin {
-		fileShare.Path = filepath.Join(tokenCache.Username, fileShare.Path)
+		share.Path = filepath.Join(tokenCache.Username, share.Path)
 	}
-	fileShare.ParentDir = common.PrivateDirName
+	share.ParentDir = common.PrivateDirName
 
-	id := service.FileShare(fileShare, tokenCache.Username)
+	id := service.FileShare(share, tokenCache.Username)
 	ctx.JSON(common.NewSuccessData("已创建分享链接", id))
 }
 
