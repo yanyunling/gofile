@@ -85,6 +85,7 @@
         <el-descriptions-item label="文件名">{{ drawerData.fileName }}</el-descriptions-item>
         <el-descriptions-item label="文件大小">{{ drawerData.total }}</el-descriptions-item>
         <el-descriptions-item :label="drawerData.isUpload ? '已上传大小' : '已下载大小'">{{ drawerData.loaded }}</el-descriptions-item>
+        <el-descriptions-item label="平均速度">{{ drawerData.rate }}</el-descriptions-item>
         <el-descriptions-item :label="drawerData.isUpload ? '上传结果' : '下载结果'">
           <el-tag v-if="drawerData.finished === '成功'" type="success" disable-transitions>成功</el-tag>
           <el-tag v-else-if="drawerData.finished === '失败'" type="danger" disable-transitions>失败</el-tag>
@@ -129,6 +130,7 @@ const drawerData = ref({
   loaded: "",
   total: "",
   percent: 0,
+  rate: "--",
 });
 
 onMounted(() => {
@@ -301,6 +303,9 @@ const onProgress = (progressEvent: AxiosProgressEvent, fileName: string, isUploa
   }
   drawerData.value.isUpload = isUpload;
   drawerData.value.fileName = fileName;
+  if (progressEvent.rate) {
+    drawerData.value.rate = Upload.formatFileSize(progressEvent.rate) + "/s";
+  }
   if (progressEvent.loaded) {
     drawerData.value.loaded = Upload.formatFileSize(progressEvent.loaded);
   }
@@ -325,6 +330,7 @@ const openDrawer = (id: string) => {
   drawerData.value.loaded = "";
   drawerData.value.total = "";
   drawerData.value.percent = 0;
+  drawerData.value.rate = "--";
   drawerData.value.visible = true;
 };
 
