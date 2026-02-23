@@ -42,9 +42,15 @@ func ShareAdd(tx *sqlx.Tx, share entity.Share) error {
 }
 
 // 根据id删除分享记录
-func ShareDelete(db *sqlx.DB, id string) error {
-	sql := `delete from t_share where id=$1`
-	_, err := db.Exec(sql, id)
+func ShareDelete(db *sqlx.DB, id, username string) error {
+	var err error
+	if username == "" {
+		sql := `delete from t_share where id=$1`
+		_, err = db.Exec(sql, id)
+	} else {
+		sql := `delete from t_share where id=$1 and username=$2`
+		_, err = db.Exec(sql, id, username)
+	}
 	return err
 }
 
@@ -87,17 +93,4 @@ func SharePage(db *sqlx.DB, page common.Page, condition entity.Share) ([]entity.
 	}
 
 	return result, countResult.Count, err
-}
-
-// 根据id删除分享记录
-func ShareDeleteById(tx *sqlx.Tx, id, username string) error {
-	var err error
-	if username == "" {
-		sql := `delete from t_share where id=$1`
-		_, err = tx.Exec(sql, id)
-	} else {
-		sql := `delete from t_share where id=$1 and username=$2`
-		_, err = tx.Exec(sql, id, username)
-	}
-	return err
 }

@@ -24,7 +24,7 @@ func init() {
 	flag.StringVar(&common.LogPath, "log", "./logs", "日志目录，存放近30天的日志")
 	flag.StringVar(&common.DataPath, "data", "./data", "数据目录，存放数据库及文件资源")
 	flag.StringVar(&common.AdminPassword, "pass", "Admin123", "超级管理员密码")
-	flag.IntVar(&common.DownloadLimitKB, "limit", 10240, "下载限速(KB)，0则不限速")
+	flag.IntVar(&common.DownloadLimitKB, "limit", 0, "下载限速(KB)，0则不限速")
 	flag.Parse()
 
 	// 固定配置

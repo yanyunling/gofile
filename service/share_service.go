@@ -47,7 +47,7 @@ func ShareGet(id string) entity.Share {
 	// 判断是否过期，过期则删除
 	currentTime := time.Now().UnixMilli()
 	if share.EndTime <= currentTime {
-		repository.ShareDelete(middleware.Db, id)
+		repository.ShareDelete(middleware.Db, id, "")
 		panic(common.NewError("分享链接已失效"))
 	}
 
@@ -67,16 +67,7 @@ func SharePage(pageCondition common.PageCondition[entity.Share]) common.PageResu
 
 // 删除分享记录
 func ShareDelete(id, username string) {
-	tx := middleware.Db.MustBegin()
-	defer tx.Rollback()
-
-	// 删除分享记录
-	err := repository.ShareDeleteById(tx, id, username)
-	if err != nil {
-		panic(common.NewErr("删除失败", err))
-	}
-
-	err = tx.Commit()
+	err := repository.ShareDelete(middleware.Db, id, username)
 	if err != nil {
 		panic(common.NewErr("删除失败", err))
 	}
