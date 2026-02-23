@@ -14,11 +14,7 @@ import (
 // 添加日志记录
 func LogAdd(level entity.LogLevel, title, content, username string) {
 	// 写入日志到文件
-	logText := "[" + title + "]"
-	if username != "" {
-		logText += "[" + username + "]"
-	}
-	logText += " " + content
+	logText := "[" + title + "]" + "[" + username + "]" + " " + content
 	switch level {
 	case entity.Debug:
 		golog.Debug(logText)

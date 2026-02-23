@@ -111,7 +111,7 @@ func FileShareDownload(ctx iris.Context, id string) {
 	share := ShareGet(id)
 
 	// 下载
-	FileDownload(ctx, share.ParentDir, share.Path, share.Name, "")
+	FileDownload(ctx, share.ParentDir, share.Path, share.Name, " ")
 }
 
 // 创建目录

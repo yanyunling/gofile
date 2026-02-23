@@ -224,7 +224,7 @@ const shareClick = (row: FileInfo) => {
             type: "success",
             title: "文件分享成功",
             dangerouslyUseHTMLString: true,
-            duration: 0,
+            duration: 5000,
             message: `<div>文件名：${row.name}</div>
           <div>有效期：${shareHours}小时</div>
           <div>链接：</div>

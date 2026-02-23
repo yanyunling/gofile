@@ -14,6 +14,7 @@
             <el-dropdown-menu>
               <el-dropdown-item v-if="!isAdmin" style="user-select: none" @click="updatePasswordDialogVisible = true">修改密码</el-dropdown-item>
               <el-dropdown-item v-if="isAdmin" style="user-select: none" @click="userDialogVisible = true">用户管理</el-dropdown-item>
+              <el-dropdown-item style="user-select: none" @click="shareDialogVisible = true">分享记录</el-dropdown-item>
               <el-dropdown-item style="user-select: none" @click="logDialogVisible = true">操作日志</el-dropdown-item>
               <el-dropdown-item style="user-select: none" @click="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
@@ -25,6 +26,7 @@
     <home class="content-view" />
     <update-password-dialog v-model:visible="updatePasswordDialogVisible" />
     <user-dialog v-model:visible="userDialogVisible" />
+    <share-dialog v-model:visible="shareDialogVisible" />
     <log-dialog v-model:visible="logDialogVisible" />
   </div>
 </template>
@@ -38,6 +40,7 @@ import { storeToRefs } from "pinia";
 import TokenApi from "@/api/token";
 import updatePasswordDialog from "@/views/user/update-password-dialog.vue";
 import userDialog from "@/views/user/index.vue";
+import shareDialog from "@/views/share/index.vue";
 import logDialog from "@/views/log/index.vue";
 import svgIcon from "@/components/svg-icon";
 import home from "@/views/home/index.vue";
@@ -46,6 +49,7 @@ const tokenStore = useTokenStore();
 const { isAdmin, accessToken, username } = storeToRefs(tokenStore);
 const updatePasswordDialogVisible = ref(false);
 const userDialogVisible = ref(false);
+const shareDialogVisible = ref(false);
 const logDialogVisible = ref(false);
 
 /**

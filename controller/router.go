@@ -47,6 +47,12 @@ func InitRouter(app *iris.Application) {
 				log.Post("/page", LogPage)
 			})
 
+			// 文件分享
+			data.PartyFunc("/share", func(share iris.Party) {
+				share.Post("/page", SharePage)
+				share.Post("/delete", ShareDelete)
+			})
+
 			// 文件管理
 			data.PartyFunc("/file", func(file iris.Party) {
 				file.Post("/public/share", FileSharePublic)

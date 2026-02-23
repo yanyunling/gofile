@@ -10,3 +10,21 @@
 .fade-leave-to {
   opacity: 0;
 }
+.filter-drawer-header {
+  margin-bottom: 0;
+  .el-drawer__title {
+    text-align: center;
+  }
+}
+.filter-drawer-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .filter-input {
+    width: 180px;
+  }
+  .search-button {
+    margin-top: 10px;
+    margin-left: -25px;
+  }
+}

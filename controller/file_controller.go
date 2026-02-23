@@ -54,7 +54,7 @@ func FileDownloadPublic(ctx iris.Context) {
 	fileInfo := entity.FileInfo{}
 	resolveParam(ctx, &fileInfo)
 
-	service.FileDownload(ctx, common.PublicDirName, fileInfo.Path, fileInfo.Name, "")
+	service.FileDownload(ctx, common.PublicDirName, fileInfo.Path, fileInfo.Name, " ")
 }
 
 // 下载保护文件

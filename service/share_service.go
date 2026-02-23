@@ -53,3 +53,31 @@ func ShareGet(id string) entity.Share {
 
 	return share
 }
+
+// 分页查询分享记录
+func SharePage(pageCondition common.PageCondition[entity.Share]) common.PageResult[entity.Share] {
+	records, total, err := repository.SharePage(middleware.Db, pageCondition.Page, pageCondition.Condition)
+	if err != nil {
+		panic(common.NewErr("查询失败", err))
+	}
+
+	pageResult := common.PageResult[entity.Share]{Records: records, Total: total}
+	return pageResult
+}
+
+// 删除分享记录
+func ShareDelete(id, username string) {
+	tx := middleware.Db.MustBegin()
+	defer tx.Rollback()
+
+	// 删除分享记录
+	err := repository.ShareDeleteById(tx, id, username)
+	if err != nil {
+		panic(common.NewErr("删除失败", err))
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		panic(common.NewErr("删除失败", err))
+	}
+}
