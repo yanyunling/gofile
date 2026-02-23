@@ -7,11 +7,11 @@ import router from "./router";
 import store from "@/store";
 import "virtual:svg-icons-register";
 import "go-captcha-vue/dist/style.css";
-import { Slide } from "go-captcha-vue";
+import GoCaptcha from "go-captcha-vue";
 
 const app = createApp(App);
 app.use(store);
 app.use(router);
 app.use(ElementPlus, { locale });
-app.component("gocaptcha-slide", Slide);
+app.use(GoCaptcha);
 app.mount("#app");

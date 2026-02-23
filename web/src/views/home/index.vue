@@ -203,20 +203,15 @@ const queryFileList = () => {
  * @param row
  */
 const shareClick = (row: FileInfo) => {
-  ElMessageBox.prompt("请输入分享时长(小时)，最长不超过720小时", "分享文件", {
+  ElMessageBox.prompt("请输入分享时长(小时)", "分享文件", {
     confirmButtonText: "创建",
     cancelButtonText: "取消",
+    inputPlaceholder: "分享时长(1-720)",
+    inputPattern: /^([1-9]|[1-9][0-9]|[1-6][0-9][0-9]|7[0-1][0-9]|720)$/,
+    inputErrorMessage: "请填写1-720之间的整数",
   })
     .then(({ value }) => {
-      if (!/^[1-9]\d*$/.test(value)) {
-        ElMessage.warning("请输入720以内的正整数");
-        return;
-      }
       let shareHours = parseInt(value);
-      if (shareHours > 720) {
-        ElMessage.warning("请输入720以内的正整数");
-        return;
-      }
       loading.value = true;
       FileApi.share(parentDir.value, pathList.value.join("/"), row.name, shareHours)
         .then((res) => {
@@ -340,6 +335,7 @@ const createFolderClick = () => {
   ElMessageBox.prompt("请输入目录名称", "创建目录", {
     confirmButtonText: "创建",
     cancelButtonText: "取消",
+    inputPlaceholder: "目录名称",
   })
     .then(({ value }) => {
       loading.value = true;
