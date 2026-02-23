@@ -49,7 +49,7 @@
 
 > [https://hub.docker.com/r/streamerzero/gofile](https://hub.docker.com/r/streamerzero/gofile)
 
-- 启动命令：`docker run -d --name gofile --restart always -p 9300:9300 -v /etc/localtime:/etc/localtime:ro -v /home/docker/gofile:/gofile/data -e pass="Admin123" -limit=0 streamerzero/gofile`
+- 启动命令：`docker run -d --name gofile --restart always -p 9300:9300 -v /etc/localtime:/etc/localtime:ro -v /home/docker/gofile:/gofile/data -e pass="Admin123" -e limit=0 streamerzero/gofile`
 
 ### 环境变量
 
