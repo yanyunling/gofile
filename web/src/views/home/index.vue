@@ -123,12 +123,12 @@ const pathList: Ref<string[]> = ref([]);
 const drawerData = ref({
   visible: false,
   id: "",
-  fileName: "",
+  fileName: "--",
   isUpload: false,
   isFinished: false,
-  finished: "",
-  loaded: "",
-  total: "",
+  finished: "进行中",
+  loaded: "--",
+  total: "--",
   percent: 0,
   rate: "--",
 });
@@ -239,29 +239,39 @@ const shareClick = (row: FileInfo) => {
  * 上传文件
  */
 const uploadClick = () => {
-  Upload.openFiles()
-    .then((fileList) => {
-      if (fileList[0].size >= 1024 * 1024 * 1024) {
-        ElMessage.error("文件大小不可超过1GB");
-        return;
-      }
-      const id = uuid();
-      openDrawer(id);
-      FileApi.upload(parentDir.value, pathList.value.join("/"), fileList[0], onProgress, id)
-        .then(() => {
-          ElMessage.success("上传成功");
+  Upload.openFiles(true)
+    .then(async (files) => {
+      out: for (let i = 0; i < files.length; i++) {
+        // 前端提前校验文件大小与重名
+        if (files[i].size >= 1024 * 1024 * 1024) {
+          ElMessage.error(`${files[i].name} 文件大小超过1GB，上传失败`);
+          continue;
+        }
+        for (let row of fileList.value) {
+          if (row.name === files[i].name) {
+            ElMessage.error(`${files[i].name} 文件已存在，上传失败`);
+            continue out;
+          }
+        }
+
+        // 循环上传
+        const id = uuid();
+        openDrawer(id);
+        try {
+          await FileApi.upload(parentDir.value, pathList.value.join("/"), files[i], onProgress, id);
+          ElMessage.success(`${files[i].name} 上传成功`);
           if (id === drawerData.value.id) {
             drawerData.value.isFinished = true;
             drawerData.value.finished = "成功";
           }
-          queryFileList();
-        })
-        .catch(() => {
+        } catch (e) {
           if (id === drawerData.value.id) {
             drawerData.value.isFinished = true;
             drawerData.value.finished = "失败";
           }
-        });
+        }
+      }
+      queryFileList();
     })
     .catch(() => {});
 };
@@ -326,9 +336,9 @@ const openDrawer = (id: string) => {
   drawerData.value.isFinished = false;
   drawerData.value.finished = "进行中";
   drawerData.value.isUpload = false;
-  drawerData.value.fileName = "";
-  drawerData.value.loaded = "";
-  drawerData.value.total = "";
+  drawerData.value.fileName = "--";
+  drawerData.value.loaded = "--";
+  drawerData.value.total = "--";
   drawerData.value.percent = 0;
   drawerData.value.rate = "--";
   drawerData.value.visible = true;
