@@ -213,7 +213,7 @@ const copyLinkClick = (id: string) => {
   if (result) {
     ElMessage.success("下载链接已复制到剪贴板");
   } else {
-    ElMessage.error("复制到剪贴板失败，链接：" + url);
+    ElMessage.error("复制到剪贴板失败");
   }
 };
 

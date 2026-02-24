@@ -100,7 +100,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, Ref, onMounted } from "vue";
+import { ref, Ref, onMounted, h } from "vue";
 import { ElMessage, ElMessageBox, ElNotification } from "element-plus";
 import FileApi from "@/api/file";
 import { saveAs } from "file-saver";
@@ -111,6 +111,7 @@ import { FolderChecked, Lock, User } from "@element-plus/icons-vue";
 import { formatTime, uuid } from "@/utils";
 import { AxiosProgressEvent } from "axios";
 import { host, context } from "@/config";
+import copy from "copy-to-clipboard";
 
 const hostUrl = process.env.NODE_ENV === "production" ? location.origin : host;
 const shareUrl = ref(`${hostUrl}${context}/open/file/share/`);
@@ -222,10 +223,21 @@ const shareClick = (row: FileInfo) => {
             title: "文件分享成功",
             dangerouslyUseHTMLString: true,
             duration: 5000,
-            message: `<div>文件名：${row.name}</div>
-          <div>有效期：${shareHours}小时</div>
-          <div>链接：</div>
-          <div style="color: #3d5eb9">${shareUrl.value}${res.data}</div>`,
+            message: h("div", [
+              h("div", null, `文件名：${row.name}`),
+              h("div", null, `有效期：${shareHours}小时`),
+              h("div", null, "链接："),
+              h(
+                "div",
+                {
+                  style: "color: #3d5eb9; cursor: pointer;",
+                  onClick: () => {
+                    copyLinkClick(res.data);
+                  },
+                },
+                `${shareUrl.value}${res.data}`,
+              ),
+            ]),
           });
         })
         .finally(() => {
@@ -233,6 +245,20 @@ const shareClick = (row: FileInfo) => {
         });
     })
     .catch(() => {});
+};
+
+/**
+ * 点击下载链接
+ * @param id
+ */
+const copyLinkClick = (id: string) => {
+  let url = shareUrl.value + id;
+  const result = copy(url);
+  if (result) {
+    ElMessage.success("下载链接已复制到剪贴板");
+  } else {
+    ElMessage.error("复制到剪贴板失败");
+  }
 };
 
 /**
