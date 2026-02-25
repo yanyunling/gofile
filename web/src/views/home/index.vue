@@ -30,7 +30,7 @@
               {{ scope.$index + 1 }}
             </template>
           </el-table-column>
-          <el-table-column prop="name" label="文件名" align="center">
+          <el-table-column prop="name" label="文件名" align="center" sortable :sort-by="['isDir', 'name']">
             <template #default="scope">
               <span v-if="scope.row.isDir" class="folder-name" @click="folderClick(scope.row)">{{ scope.row.name }}</span>
               <span v-else>{{ scope.row.name }}</span>
@@ -52,7 +52,7 @@
               {{ scope.row.isDir ? "--" : Upload.formatFileSize(scope.row.size) }}
             </template>
           </el-table-column>
-          <el-table-column prop="updateTime" label="更新时间" align="center" width="150">
+          <el-table-column prop="updateTime" label="更新时间" align="center" width="150" sortable :sort-by="['isDir', 'updateTime']">
             <template #default="scope">
               {{ formatTime(scope.row.updateTime) }}
             </template>
