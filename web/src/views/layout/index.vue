@@ -16,14 +16,15 @@
               <el-dropdown-item v-if="isAdmin" style="user-select: none" @click="userDialogVisible = true">用户管理</el-dropdown-item>
               <el-dropdown-item style="user-select: none" @click="shareDialogVisible = true">分享记录</el-dropdown-item>
               <el-dropdown-item style="user-select: none" @click="logDialogVisible = true">操作日志</el-dropdown-item>
-              <el-dropdown-item style="user-select: none" @click="logout">退出登录</el-dropdown-item>
+              <el-dropdown-item style="user-select: none" @click="logoutClick">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
-        <div v-else class="text-view" @click="login">登录</div>
+        <div v-else class="text-view" @click="loginClick">登录</div>
       </div>
     </div>
     <home class="content-view" />
+    <login />
     <update-password-dialog v-model:visible="updatePasswordDialogVisible" />
     <user-dialog v-model:visible="userDialogVisible" />
     <share-dialog v-model:visible="shareDialogVisible" />
@@ -38,12 +39,13 @@ import { useTokenStore } from "@/store/token";
 import { useCommonStore } from "@/store/common";
 import { storeToRefs } from "pinia";
 import TokenApi from "@/api/token";
+import home from "@/views/home/index.vue";
+import login from "@/views/login/index.vue";
 import updatePasswordDialog from "@/views/user/update-password-dialog.vue";
 import userDialog from "@/views/user/index.vue";
 import shareDialog from "@/views/share/index.vue";
 import logDialog from "@/views/log/index.vue";
 import svgIcon from "@/components/svg-icon";
-import home from "@/views/home/index.vue";
 
 const tokenStore = useTokenStore();
 const { isAdmin, accessToken, username } = storeToRefs(tokenStore);
@@ -55,14 +57,14 @@ const logDialogVisible = ref(false);
 /**
  * 点击登录
  */
-const login = () => {
+const loginClick = () => {
   useCommonStore().loginVisible = true;
 };
 
 /**
  * 点击退出登录
  */
-const logout = () => {
+const logoutClick = () => {
   ElMessageBox.confirm("是否退出登录？", "提示", {
     confirmButtonText: "退出登录",
     cancelButtonText: "取消",

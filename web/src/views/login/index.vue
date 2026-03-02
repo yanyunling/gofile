@@ -54,7 +54,6 @@ import { useTokenStore } from "@/store/token";
 import { useCommonStore } from "@/store/common";
 import TokenApi from "@/api/token";
 import { ElMessage } from "element-plus";
-import { SlidePoint } from "go-captcha-vue/dist/components/slide/meta/data";
 import { storeToRefs } from "pinia";
 
 const tokenStore = useTokenStore();
@@ -134,7 +133,7 @@ const captchaGet = () => {
  * @param point
  * @param reset
  */
-const captchaConfirm = (point: SlidePoint, reset: () => void) => {
+const captchaConfirm = (point, reset: () => void) => {
   signInData.value.captchaX = point.x;
   signInData.value.captchaY = point.y;
   captchaLoading.value = true;
