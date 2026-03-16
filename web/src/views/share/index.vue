@@ -37,7 +37,7 @@
           <template #default="scope">
             <el-popover placement="left" :width="286" trigger="hover">
               <template #reference>
-                <svg-icon name="qrcode" customStyle="width: 15px; height: 15px; margin-right: 8px; cursor: pointer;"></svg-icon>
+                <svg-icon name="qrcode" customStyle="width: 15px; height: 15px; margin-right: 8px; cursor: pointer; outline: none;"></svg-icon>
               </template>
               <qrcode-vue :value="shareUrl + scope.row.id" :size="260" level="H" :margin="2"></qrcode-vue>
               <div style="text-align: center; color: #3d5eb9;">{{  scope.row.name }}</div>

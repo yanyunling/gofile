@@ -31,7 +31,7 @@ export default defineComponent({
       return (
         <svg
           class={svgClass.value}
-          aria-hidden={true}
+          inert
           style={props.customStyle}
           onClick={(ev: MouseEvent) => {
             emit("click", ev);
