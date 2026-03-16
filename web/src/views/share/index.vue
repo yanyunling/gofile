@@ -20,9 +20,20 @@
         <el-table-column prop="parentDir" label="根目录" align="center" width="150" />
         <el-table-column prop="path" label="父级目录" align="center" />
         <el-table-column prop="name" label="文件名" align="center" />
-        <el-table-column prop="id" label="下载链接" align="center">
+        <el-table-column prop="" label="下载链接" align="center">
           <template #default="scope">
             <span style="cursor: pointer; color: #3d5eb9" @click="copyLinkClick(scope.row.id)">{{ shareUrl + scope.row.id }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="" label="二维码" align="center" width="80">
+          <template #default="scope">
+            <el-popover placement="left" :width="286" trigger="hover">
+              <template #reference>
+                <qrcode style="width: 15px; height: 15px; fill: currentColor; cursor: pointer; outline: none" />
+              </template>
+              <qrcode-vue :value="shareUrl + scope.row.id" :size="260" level="H" :margin="2"></qrcode-vue>
+              <div style="text-align: center; color: #3d5eb9">{{ scope.row.name }}</div>
+            </el-popover>
           </template>
         </el-table-column>
         <el-table-column prop="username" label="操作用户" align="center" width="150" />
@@ -33,15 +44,8 @@
         <el-table-column prop="endTime" label="截止时间" align="center" width="160">
           <template #default="scope"> {{ formatTime(scope.row.endTime, "YYYY-MM-DD HH:mm:ss") }} </template>
         </el-table-column>
-        <el-table-column prop="" label="操作" align="center" width="100">
+        <el-table-column prop="" label="操作" align="center" width="80">
           <template #default="scope">
-            <el-popover placement="left" :width="286" trigger="hover">
-              <template #reference>
-                <svg-icon name="qrcode" customStyle="width: 15px; height: 15px; margin-right: 8px; cursor: pointer; outline: none;"></svg-icon>
-              </template>
-              <qrcode-vue :value="shareUrl + scope.row.id" :size="260" level="H" :margin="2"></qrcode-vue>
-              <div style="text-align: center; color: #3d5eb9;">{{  scope.row.name }}</div>
-            </el-popover>
             <el-button type="danger" link size="small" @click="deleteClick(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -113,7 +117,7 @@ import { storeToRefs } from "pinia";
 import { host, context } from "@/config";
 import copy from "copy-to-clipboard";
 import QrcodeVue from "qrcode.vue";
-import svgIcon from "@/components/svg-icon";
+import qrcode from "@/icons/qrcode.svg";
 
 const emit = defineEmits<{ "update:visible": [visible: boolean] }>();
 

@@ -2,7 +2,7 @@
   <div class="page-layout">
     <div class="top-view">
       <div class="left-view">
-        <svg-icon name="logo" customStyle="width: 15px; height: 15px; margin-top: 2px"></svg-icon>
+        <logo style="width: 15px; height: 15px; margin-top: 3px; fill: currentColor" />
         <div class="title-view">文件服务器</div>
       </div>
       <div class="right-view">
@@ -45,7 +45,7 @@ import updatePasswordDialog from "@/views/user/update-password-dialog.vue";
 import userDialog from "@/views/user/index.vue";
 import shareDialog from "@/views/share/index.vue";
 import logDialog from "@/views/log/index.vue";
-import svgIcon from "@/components/svg-icon";
+import logo from "@/icons/logo.svg";
 
 const tokenStore = useTokenStore();
 const { isAdmin, accessToken, username } = storeToRefs(tokenStore);

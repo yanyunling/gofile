@@ -2,17 +2,10 @@ import { defineConfig } from "vite";
 import { resolve } from "path";
 import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
-import { createSvgIconsPlugin } from "vite-plugin-svg-icons";
+import svgLoader from "vite-svg-loader";
 
 export default defineConfig({
-  plugins: [
-    vue(),
-    vueJsx(),
-    createSvgIconsPlugin({
-      iconDirs: [resolve(process.cwd(), "src/icons")],
-      symbolId: "icon-[dir]-[name]",
-    }),
-  ],
+  plugins: [vue(), vueJsx(), svgLoader()],
   base: "./",
   resolve: {
     alias: {
