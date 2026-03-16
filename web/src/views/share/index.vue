@@ -33,8 +33,15 @@
         <el-table-column prop="endTime" label="截止时间" align="center" width="160">
           <template #default="scope"> {{ formatTime(scope.row.endTime, "YYYY-MM-DD HH:mm:ss") }} </template>
         </el-table-column>
-        <el-table-column prop="" label="操作" align="center" width="80">
+        <el-table-column prop="" label="操作" align="center" width="100">
           <template #default="scope">
+            <el-popover placement="left" :width="286" trigger="hover">
+              <template #reference>
+                <svg-icon name="qrcode" customStyle="width: 15px; height: 15px; margin-right: 8px; cursor: pointer;"></svg-icon>
+              </template>
+              <qrcode-vue :value="shareUrl + scope.row.id" :size="260" level="H" :margin="2"></qrcode-vue>
+              <div style="text-align: center; color: #3d5eb9;">{{  scope.row.name }}</div>
+            </el-popover>
             <el-button type="danger" link size="small" @click="deleteClick(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -105,6 +112,8 @@ import { useTokenStore } from "@/store/token";
 import { storeToRefs } from "pinia";
 import { host, context } from "@/config";
 import copy from "copy-to-clipboard";
+import QrcodeVue from "qrcode.vue";
+import svgIcon from "@/components/svg-icon";
 
 const emit = defineEmits<{ "update:visible": [visible: boolean] }>();
 

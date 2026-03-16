@@ -16,6 +16,7 @@
     "go-captcha-vue": "2.0.6",
     "pinia": "3.0.4",
     "pinia-plugin-persistedstate": "4.7.1",
+    "qrcode.vue": "3.8.0",
     "vue": "3.5.30",
     "vue-router": "5.0.3"
   },
