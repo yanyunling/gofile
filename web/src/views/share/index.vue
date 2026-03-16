@@ -27,7 +27,7 @@
         </el-table-column>
         <el-table-column prop="" label="二维码" align="center" width="80">
           <template #default="scope">
-            <el-popover placement="left" :width="286" trigger="hover">
+            <el-popover placement="left" :width="286" trigger="click">
               <template #reference>
                 <qrcode style="width: 15px; height: 15px; fill: currentColor; cursor: pointer; outline: none" />
               </template>
