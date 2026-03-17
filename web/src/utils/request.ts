@@ -145,7 +145,9 @@ dataInstance.interceptors.response.use(
     return Promise.reject(response);
   },
   (error) => {
-    ElMessage.error("连接超时");
+    if (!axios.isCancel(error)) {
+      ElMessage.error("连接超时");
+    }
     return Promise.reject(error);
   },
 );
@@ -168,7 +170,9 @@ authInstance.interceptors.response.use(
     return Promise.reject(response);
   },
   (error) => {
-    ElMessage.error("连接超时");
+    if (!axios.isCancel(error)) {
+      ElMessage.error("连接超时");
+    }
     return Promise.reject(error);
   },
 );
@@ -196,7 +200,9 @@ openInstance.interceptors.response.use(
     return Promise.reject(response);
   },
   (error) => {
-    ElMessage.error("连接超时");
+    if (!axios.isCancel(error)) {
+      ElMessage.error("连接超时");
+    }
     return Promise.reject(error);
   },
 );

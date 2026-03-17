@@ -43,9 +43,10 @@ class FileApi {
    * @param name
    * @param onProgress
    * @param id
+   * @param abortController
    * @returns
    */
-  download(parentDir: string, path: string, name: string, onProgress: Function, id: string) {
+  download(parentDir: string, path: string, name: string, onProgress: Function, id: string, abortController: AbortController) {
     let listFunc = request;
     if (parentDir === "public") {
       listFunc = openRequest;
@@ -55,6 +56,7 @@ class FileApi {
       url: `/file/${parentDir}/download`,
       responseType: "blob",
       timeout: 0,
+      signal: abortController.signal,
       data: { path: path, name: name },
       onDownloadProgress: (progressEvent) => {
         onProgress(progressEvent, name, false, id);
@@ -69,9 +71,10 @@ class FileApi {
    * @param file
    * @param onProgress
    * @param id
+   * @param abortController
    * @returns
    */
-  upload(parentDir: string, path: string, file: File, onProgress: Function, id: string) {
+  upload(parentDir: string, path: string, file: File, onProgress: Function, id: string, abortController: AbortController) {
     const formData = new FormData();
     formData.append("path", path);
     formData.append("file", file);
@@ -79,6 +82,7 @@ class FileApi {
       method: "post",
       url: `/file/${parentDir}/upload`,
       timeout: 0,
+      signal: abortController.signal,
       data: formData,
       onUploadProgress(progressEvent) {
         onProgress(progressEvent, file.name, true, id);

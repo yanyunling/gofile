@@ -94,6 +94,11 @@
         <el-descriptions-item :label="drawerData.isUpload ? '上传进度' : '下载进度'">
           <el-progress :percentage="drawerData.percent" :stroke-width="20" striped striped-flow :duration="20" />
         </el-descriptions-item>
+        <el-descriptions-item label="操作">
+          <el-button :disabled="drawerData.isFinished" type="danger" @click="stopClick">
+            {{ drawerData.isUpload ? "取消上传" : "取消下载" }}
+          </el-button>
+        </el-descriptions-item>
       </el-descriptions>
     </el-drawer>
   </div>
@@ -132,6 +137,7 @@ const drawerData = ref({
   total: "--",
   percent: 0,
   rate: "--",
+  abortController: null,
 });
 
 onMounted(() => {
@@ -284,7 +290,7 @@ const uploadClick = () => {
         const id = uuid();
         openDrawer(id);
         try {
-          await FileApi.upload(parentDir.value, pathList.value.join("/"), files[i], onProgress, id);
+          await FileApi.upload(parentDir.value, pathList.value.join("/"), files[i], onProgress, id, drawerData.value.abortController);
           ElMessage.success(`${files[i].name} 上传成功`);
           if (id === drawerData.value.id) {
             drawerData.value.isFinished = true;
@@ -309,7 +315,7 @@ const downloadClick = (row: FileInfo) => {
   const fileName = row.name;
   const id = uuid();
   openDrawer(id);
-  FileApi.download(parentDir.value, pathList.value.join("/"), fileName, onProgress, id)
+  FileApi.download(parentDir.value, pathList.value.join("/"), fileName, onProgress, id, drawerData.value.abortController)
     .then((res) => {
       saveAs(res, fileName);
       if (id === drawerData.value.id) {
@@ -368,6 +374,16 @@ const openDrawer = (id: string) => {
   drawerData.value.percent = 0;
   drawerData.value.rate = "--";
   drawerData.value.visible = true;
+  drawerData.value.abortController = new AbortController();
+};
+
+/**
+ * 停止下载/上传
+ */
+const stopClick = () => {
+  if (drawerData.value.abortController) {
+    drawerData.value.abortController.abort();
+  }
 };
 
 /**
