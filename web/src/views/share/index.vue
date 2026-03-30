@@ -1,6 +1,43 @@
 <template>
   <div class="page-share">
-    <el-button class="filter-button" type="primary" :icon="Filter" @click="drawerVisible = true" :loading="tableLoading">条件查询</el-button>
+    <div class="filter-view">
+      <el-form inline>
+        <el-form-item label="根目录">
+          <el-select class="filter-input" v-model="tableCondition.condition.parentDir" placeholder="根目录筛选" clearable>
+            <el-option label="public" value="public" />
+            <el-option label="protected" value="protected" />
+            <el-option label="private" value="private" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="父级目录">
+          <el-input class="filter-input" v-model="tableCondition.condition.path" placeholder="父级目录筛选" clearable />
+        </el-form-item>
+        <el-form-item label="文件名">
+          <el-input class="filter-input" v-model="tableCondition.condition.name" placeholder="文件名筛选" clearable />
+        </el-form-item>
+        <el-form-item label="操作用户" v-if="isAdmin">
+          <el-input class="filter-input" v-model="tableCondition.condition.username" placeholder="用户筛选" clearable />
+        </el-form-item>
+        <el-form-item label="分享小时数">
+          <el-input-number style="width: 120px" v-model="tableCondition.condition.shareHours" :min="1" :max="720" />
+        </el-form-item>
+        <el-form-item label="创建时间">
+          <el-date-picker
+            style="width: 240px"
+            v-model="dateRange"
+            type="daterange"
+            value-format="x"
+            range-separator="至"
+            start-placeholder="起始时间"
+            end-placeholder="截止时间"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" :icon="Search" @click="tablePageCurrentChange(1)" :loading="tableLoading">查询</el-button>
+          <el-button @click="resetCondition">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
     <el-table class="table-view" ref="tableRef" :data="tableData" height="100%" stripe border size="small" v-loading="tableLoading">
       <el-table-column prop="" label="序号" align="center" width="60">
         <template #default="scope">
@@ -50,55 +87,13 @@
       @size-change="tablePageSizeChange"
       @current-change="tablePageCurrentChange"
     ></el-pagination>
-    <el-drawer
-      v-model="drawerVisible"
-      title="条件查询"
-      direction="ttb"
-      append-to-body
-      size="30%"
-      header-class="filter-drawer-header"
-      body-class="filter-drawer-body"
-    >
-      <el-form inline>
-        <el-form-item label="根目录">
-          <el-select class="filter-input" v-model="tableCondition.condition.parentDir" placeholder="根目录筛选" clearable>
-            <el-option label="public" value="public" />
-            <el-option label="protected" value="protected" />
-            <el-option label="private" value="private" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="父级目录">
-          <el-input class="filter-input" v-model="tableCondition.condition.path" placeholder="父级目录筛选" clearable />
-        </el-form-item>
-        <el-form-item label="文件名">
-          <el-input class="filter-input" v-model="tableCondition.condition.name" placeholder="文件名筛选" clearable />
-        </el-form-item>
-        <el-form-item label="操作用户" v-if="isAdmin">
-          <el-input class="filter-input" v-model="tableCondition.condition.username" placeholder="用户筛选" clearable />
-        </el-form-item>
-        <el-form-item label="分享小时数">
-          <el-input-number class="filter-input" v-model="tableCondition.condition.shareHours" :min="1" :max="720" />
-        </el-form-item>
-        <el-form-item label="创建时间">
-          <el-date-picker
-            v-model="dateRange"
-            type="daterange"
-            value-format="x"
-            range-separator="至"
-            start-placeholder="起始时间"
-            end-placeholder="截止时间"
-          />
-        </el-form-item>
-      </el-form>
-      <el-button class="search-button" type="primary" :icon="Search" @click="tablePageCurrentChange(1)" :loading="tableLoading">查询</el-button>
-    </el-drawer>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, Ref, onMounted, nextTick } from "vue";
 import { ElTable, ElMessage, ElMessageBox } from "element-plus";
-import { Search, Filter } from "@element-plus/icons-vue";
+import { Search } from "@element-plus/icons-vue";
 import ShareApi from "@/api/share";
 import { formatTime } from "@/utils";
 import { useTokenStore } from "@/store/token";
@@ -132,7 +127,6 @@ const tableCondition: Ref<PageCondition<Share>> = ref({
   },
 });
 const tableRef = ref<InstanceType<typeof ElTable>>();
-const drawerVisible = ref(false);
 const dateRange = ref([]);
 
 onMounted(() => {
@@ -161,7 +155,6 @@ const queryTableData = () => {
     })
     .finally(() => {
       tableLoading.value = false;
-      drawerVisible.value = false;
     });
 };
 
@@ -199,6 +192,30 @@ const copyLinkClick = (id: string) => {
 };
 
 /**
+ * 重置查询条件
+ */
+const resetCondition = () => {
+  tableCondition.value = {
+    page: {
+      current: 1,
+      size: 100,
+    },
+    condition: {
+      id: "",
+      parentDir: "",
+      path: "",
+      name: "",
+      username: "",
+      shareHours: undefined,
+      startTime: 0,
+      endTime: 0,
+    },
+  };
+  dateRange.value = [];
+  queryTableData();
+};
+
+/**
  * 删除记录
  * @param row
  */
@@ -228,9 +245,20 @@ const deleteClick = (row: Share) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  .filter-button {
-    margin: 10px;
-    margin-left: -20px;
+  .filter-view {
+    width: 100%;
+    margin-top: 10px;
+    .el-form {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      .el-form-item {
+        margin-bottom: 10px;
+      }
+    }
+    .filter-input {
+      width: 180px;
+    }
   }
   .table-view {
     .el-scrollbar__wrap {
