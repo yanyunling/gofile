@@ -82,7 +82,7 @@ const logoutClick = () => {
     .then(() => {
       TokenApi.signOut();
       tokenStore.removeToken();
-      location.reload();
+      router.replace("/home");
     })
     .catch(() => {});
 };
