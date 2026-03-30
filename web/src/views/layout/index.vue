@@ -82,7 +82,12 @@ const logoutClick = () => {
     .then(() => {
       TokenApi.signOut();
       tokenStore.removeToken();
-      router.replace("/home");
+      // 判断是否在主页
+      if (router.currentRoute.value.path === "/home" || router.currentRoute.value.path === "/") {
+        location.reload();
+      } else {
+        router.replace("/home");
+      }
     })
     .catch(() => {});
 };
