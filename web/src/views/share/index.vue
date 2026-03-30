@@ -1,66 +1,55 @@
 <template>
-  <el-dialog
-    :model-value="props.visible"
-    title="分享记录"
-    append-to-body
-    destroy-on-close
-    :close-on-click-modal="false"
-    center
-    fullscreen
-    :before-close="beforeClose"
-  >
-    <div class="page-share">
-      <el-button class="filter-button" type="primary" :icon="Filter" @click="drawerVisible = true" :loading="tableLoading">条件查询</el-button>
-      <el-table class="table-view" ref="tableRef" :data="tableData" height="100%" stripe border size="small" v-loading="tableLoading">
-        <el-table-column prop="" label="序号" align="center" width="60">
-          <template #default="scope">
-            {{ (tableCondition.page.current - 1) * tableCondition.page.size + scope.$index + 1 }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="parentDir" label="根目录" align="center" width="150" />
-        <el-table-column prop="path" label="父级目录" align="center" />
-        <el-table-column prop="name" label="文件名" align="center" />
-        <el-table-column prop="" label="下载链接" align="center">
-          <template #default="scope">
-            <span style="cursor: pointer; color: #3d5eb9" @click="copyLinkClick(scope.row.id)">{{ shareUrl + scope.row.id }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="" label="二维码" align="center" width="80">
-          <template #default="scope">
-            <el-popover placement="left" :width="286" trigger="click">
-              <template #reference>
-                <qrcode style="width: 15px; height: 15px; fill: currentColor; cursor: pointer; outline: none" />
-              </template>
-              <qrcode-vue :value="shareUrl + scope.row.id" :size="260" level="H" :margin="2"></qrcode-vue>
-              <div style="text-align: center; color: #3d5eb9">{{ scope.row.name }}</div>
-            </el-popover>
-          </template>
-        </el-table-column>
-        <el-table-column prop="username" label="操作用户" align="center" width="150" />
-        <el-table-column prop="shareHours" label="分享小时数" align="center" width="80" />
-        <el-table-column prop="startTime" label="起始时间" align="center" width="160">
-          <template #default="scope"> {{ formatTime(scope.row.startTime, "YYYY-MM-DD HH:mm:ss") }} </template>
-        </el-table-column>
-        <el-table-column prop="endTime" label="截止时间" align="center" width="160">
-          <template #default="scope"> {{ formatTime(scope.row.endTime, "YYYY-MM-DD HH:mm:ss") }} </template>
-        </el-table-column>
-        <el-table-column prop="" label="操作" align="center" width="80">
-          <template #default="scope">
-            <el-button type="danger" link size="small" @click="deleteClick(scope.row)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-pagination
-        background
-        layout="total, sizes, prev, pager, next, jumper"
-        :pageSizes="[10, 20, 50, 100, 200, 500]"
-        v-model:pageSize="tableCondition.page.size"
-        v-model:currentPage="tableCondition.page.current"
-        :total="tableTotal"
-        @size-change="tablePageSizeChange"
-        @current-change="tablePageCurrentChange"
-      ></el-pagination>
-    </div>
+  <div class="page-share">
+    <el-button class="filter-button" type="primary" :icon="Filter" @click="drawerVisible = true" :loading="tableLoading">条件查询</el-button>
+    <el-table class="table-view" ref="tableRef" :data="tableData" height="100%" stripe border size="small" v-loading="tableLoading">
+      <el-table-column prop="" label="序号" align="center" width="60">
+        <template #default="scope">
+          {{ (tableCondition.page.current - 1) * tableCondition.page.size + scope.$index + 1 }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="parentDir" label="根目录" align="center" width="150" />
+      <el-table-column prop="path" label="父级目录" align="center" />
+      <el-table-column prop="name" label="文件名" align="center" />
+      <el-table-column prop="" label="下载链接" align="center">
+        <template #default="scope">
+          <span style="cursor: pointer; color: #3d5eb9" @click="copyLinkClick(scope.row.id)">{{ shareUrl + scope.row.id }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="" label="二维码" align="center" width="80">
+        <template #default="scope">
+          <el-popover placement="left" :width="286" trigger="click">
+            <template #reference>
+              <qrcode style="width: 15px; height: 15px; fill: currentColor; cursor: pointer; outline: none" />
+            </template>
+            <qrcode-vue :value="shareUrl + scope.row.id" :size="260" level="H" :margin="2"></qrcode-vue>
+            <div style="text-align: center; color: #3d5eb9">{{ scope.row.name }}</div>
+          </el-popover>
+        </template>
+      </el-table-column>
+      <el-table-column prop="username" label="操作用户" align="center" width="150" />
+      <el-table-column prop="shareHours" label="分享小时数" align="center" width="80" />
+      <el-table-column prop="startTime" label="起始时间" align="center" width="160">
+        <template #default="scope"> {{ formatTime(scope.row.startTime, "YYYY-MM-DD HH:mm:ss") }} </template>
+      </el-table-column>
+      <el-table-column prop="endTime" label="截止时间" align="center" width="160">
+        <template #default="scope"> {{ formatTime(scope.row.endTime, "YYYY-MM-DD HH:mm:ss") }} </template>
+      </el-table-column>
+      <el-table-column prop="" label="操作" align="center" width="80">
+        <template #default="scope">
+          <el-button type="danger" link size="small" @click="deleteClick(scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+      background
+      layout="total, sizes, prev, pager, next, jumper"
+      :pageSizes="[10, 20, 50, 100, 200, 500]"
+      v-model:pageSize="tableCondition.page.size"
+      v-model:currentPage="tableCondition.page.current"
+      :total="tableTotal"
+      @size-change="tablePageSizeChange"
+      @current-change="tablePageCurrentChange"
+    ></el-pagination>
     <el-drawer
       v-model="drawerVisible"
       title="条件查询"
@@ -103,11 +92,11 @@
       </el-form>
       <el-button class="search-button" type="primary" :icon="Search" @click="tablePageCurrentChange(1)" :loading="tableLoading">查询</el-button>
     </el-drawer>
-  </el-dialog>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, Ref, watch, nextTick } from "vue";
+import { ref, Ref, onMounted, nextTick } from "vue";
 import { ElTable, ElMessage, ElMessageBox } from "element-plus";
 import { Search, Filter } from "@element-plus/icons-vue";
 import ShareApi from "@/api/share";
@@ -118,15 +107,6 @@ import { host, context } from "@/config";
 import copy from "copy-to-clipboard";
 import QrcodeVue from "qrcode.vue";
 import qrcode from "@/icons/qrcode.svg";
-
-const emit = defineEmits<{ "update:visible": [visible: boolean] }>();
-
-const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-});
 
 const hostUrl = process.env.NODE_ENV === "production" ? location.origin : host;
 const shareUrl = ref(`${hostUrl}${context}/open/file/share/`);
@@ -155,14 +135,9 @@ const tableRef = ref<InstanceType<typeof ElTable>>();
 const drawerVisible = ref(false);
 const dateRange = ref([]);
 
-watch(
-  () => props.visible,
-  (val) => {
-    if (val) {
-      queryTableData();
-    }
-  },
-);
+onMounted(() => {
+  queryTableData();
+});
 
 /**
  * 查询表格数据
@@ -210,13 +185,6 @@ const tablePageCurrentChange = (current: number) => {
 };
 
 /**
- * 弹窗关闭
- */
-const beforeClose = () => {
-  emit("update:visible", false);
-};
-
-/**
  * 点击下载链接
  * @param id
  */
@@ -255,18 +223,11 @@ const deleteClick = (row: Share) => {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .page-share {
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: fixed;
-  width: 100%;
-  height: calc(100% - 50px);
-  left: 0;
-  right: 0;
-  top: 50px;
-  bottom: 0;
   .filter-button {
     margin: 10px;
     margin-left: -20px;

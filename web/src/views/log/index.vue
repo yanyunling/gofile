@@ -1,45 +1,34 @@
 <template>
-  <el-dialog
-    :model-value="props.visible"
-    title="操作日志"
-    append-to-body
-    destroy-on-close
-    :close-on-click-modal="false"
-    center
-    fullscreen
-    :before-close="beforeClose"
-  >
-    <div class="page-log">
-      <el-button class="filter-button" type="primary" :icon="Filter" @click="drawerVisible = true" :loading="tableLoading">条件查询</el-button>
-      <el-table class="table-view" ref="tableRef" :data="tableData" height="100%" stripe border size="small" v-loading="tableLoading">
-        <el-table-column prop="" label="序号" align="center" width="60">
-          <template #default="scope">
-            {{ (tableCondition.page.current - 1) * tableCondition.page.size + scope.$index + 1 }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="level" label="级别" align="center" width="80">
-          <template #default="scope">
-            <el-tag :type="levelToTag(scope.row.level)" disable-transitions>{{ scope.row.level }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="title" label="标题" align="center" width="150" />
-        <el-table-column prop="content" label="内容" align="left" header-align="center" />
-        <el-table-column prop="username" label="操作用户" align="center" width="150" />
-        <el-table-column prop="createTime" label="时间" align="center" width="160">
-          <template #default="scope"> {{ formatTime(scope.row.createTime, "YYYY-MM-DD HH:mm:ss") }} </template>
-        </el-table-column>
-      </el-table>
-      <el-pagination
-        background
-        layout="total, sizes, prev, pager, next, jumper"
-        :pageSizes="[10, 20, 50, 100, 200, 500]"
-        v-model:pageSize="tableCondition.page.size"
-        v-model:currentPage="tableCondition.page.current"
-        :total="tableTotal"
-        @size-change="tablePageSizeChange"
-        @current-change="tablePageCurrentChange"
-      ></el-pagination>
-    </div>
+  <div class="page-log">
+    <el-button class="filter-button" type="primary" :icon="Filter" @click="drawerVisible = true" :loading="tableLoading">条件查询</el-button>
+    <el-table class="table-view" ref="tableRef" :data="tableData" height="100%" stripe border size="small" v-loading="tableLoading">
+      <el-table-column prop="" label="序号" align="center" width="60">
+        <template #default="scope">
+          {{ (tableCondition.page.current - 1) * tableCondition.page.size + scope.$index + 1 }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="level" label="级别" align="center" width="80">
+        <template #default="scope">
+          <el-tag :type="levelToTag(scope.row.level)" disable-transitions>{{ scope.row.level }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="title" label="标题" align="center" width="150" />
+      <el-table-column prop="content" label="内容" align="left" header-align="center" />
+      <el-table-column prop="username" label="操作用户" align="center" width="150" />
+      <el-table-column prop="createTime" label="时间" align="center" width="160">
+        <template #default="scope"> {{ formatTime(scope.row.createTime, "YYYY-MM-DD HH:mm:ss") }} </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+      background
+      layout="total, sizes, prev, pager, next, jumper"
+      :pageSizes="[10, 20, 50, 100, 200, 500]"
+      v-model:pageSize="tableCondition.page.size"
+      v-model:currentPage="tableCondition.page.current"
+      :total="tableTotal"
+      @size-change="tablePageSizeChange"
+      @current-change="tablePageCurrentChange"
+    ></el-pagination>
     <el-drawer
       v-model="drawerVisible"
       title="条件查询"
@@ -80,26 +69,17 @@
       </el-form>
       <el-button class="search-button" type="primary" :icon="Search" @click="tablePageCurrentChange(1)" :loading="tableLoading">查询</el-button>
     </el-drawer>
-  </el-dialog>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, Ref, watch, nextTick } from "vue";
+import { ref, Ref, onMounted, nextTick } from "vue";
 import { ElTable } from "element-plus";
 import { Search, Filter } from "@element-plus/icons-vue";
 import LogApi from "@/api/log";
 import { formatTime } from "@/utils";
 import { useTokenStore } from "@/store/token";
 import { storeToRefs } from "pinia";
-
-const emit = defineEmits<{ "update:visible": [visible: boolean] }>();
-
-const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-});
 
 const tokenStore = useTokenStore();
 const { isAdmin } = storeToRefs(tokenStore);
@@ -124,14 +104,9 @@ const tableRef = ref<InstanceType<typeof ElTable>>();
 const drawerVisible = ref(false);
 const dateRange = ref([]);
 
-watch(
-  () => props.visible,
-  (val) => {
-    if (val) {
-      queryTableData();
-    }
-  },
-);
+onMounted(() => {
+  queryTableData();
+});
 
 /**
  * 查询表格数据
@@ -179,13 +154,6 @@ const tablePageCurrentChange = (current: number) => {
 };
 
 /**
- * 弹窗关闭
- */
-const beforeClose = () => {
-  emit("update:visible", false);
-};
-
-/**
  * 日志等级转tag颜色
  * @param level
  */
@@ -201,18 +169,11 @@ const levelToTag = (level: string) => {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .page-log {
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: fixed;
-  width: 100%;
-  height: calc(100% - 50px);
-  left: 0;
-  right: 0;
-  top: 50px;
-  bottom: 0;
   .filter-button {
     margin: 10px;
     margin-left: -20px;
