@@ -21,6 +21,7 @@
         </el-form-item>
         <el-form-item label="时间">
           <el-date-picker
+            v-if="!isMobile"
             style="width: 240px"
             v-model="dateRange"
             type="daterange"
@@ -28,6 +29,18 @@
             range-separator="至"
             start-placeholder="起始时间"
             end-placeholder="截止时间"
+            @change="dateRangeChange"
+            @clear="dateClear"
+          />
+          <el-date-picker
+            v-else
+            style="width: 180px"
+            v-model="dateMonth"
+            type="month"
+            value-format="x"
+            placeholder="选择月份"
+            @change="dateMonthChange"
+            @clear="dateClear"
           />
         </el-form-item>
         <el-form-item>
@@ -78,6 +91,7 @@ import { useTokenStore } from "@/store/token";
 import { storeToRefs } from "pinia";
 import { useIsMobile } from "@/utils/useIsMobile";
 import LogCardList from "./log-card-list.vue";
+import { getMonthLastMilliSecond } from "@/utils/time";
 
 const isMobile = useIsMobile();
 const tokenStore = useTokenStore();
@@ -101,6 +115,7 @@ const tableCondition: Ref<PageCondition<LogCondition>> = ref({
 });
 const tableRef = ref<InstanceType<typeof ElTable>>();
 const dateRange = ref([]);
+const dateMonth = ref("");
 
 onMounted(() => {
   if (isMobile.value) {
@@ -113,13 +128,6 @@ onMounted(() => {
  * 查询表格数据
  */
 const queryTableData = () => {
-  if (dateRange.value && dateRange.value.length === 2) {
-    tableCondition.value.condition.startTime = dateRange.value[0];
-    tableCondition.value.condition.endTime = dateRange.value[1] + 86400000 - 1;
-  } else {
-    tableCondition.value.condition.startTime = 0;
-    tableCondition.value.condition.endTime = 0;
-  }
   tableLoading.value = true;
   LogApi.page(tableCondition.value)
     .then((res) => {
@@ -158,6 +166,39 @@ const tablePageCurrentChange = (current: number) => {
 };
 
 /**
+ * 日期范围选择变化
+ * @param date
+ */
+const dateRangeChange = (date: number[]) => {
+  dateMonth.value = "";
+  if (date && date.length === 2) {
+    tableCondition.value.condition.startTime = date[0];
+    tableCondition.value.condition.endTime = date[1] + 86400000 - 1;
+  } else {
+    tableCondition.value.condition.startTime = 0;
+    tableCondition.value.condition.endTime = 0;
+  }
+};
+
+/**
+ * 月份选择变化
+ * @param date
+ */
+const dateMonthChange = (date: number) => {
+  dateRange.value = [];
+  tableCondition.value.condition.startTime = date;
+  tableCondition.value.condition.endTime = getMonthLastMilliSecond(date);
+};
+
+/**
+ * 日期清空
+ */
+const dateClear = () => {
+  tableCondition.value.condition.startTime = 0;
+  tableCondition.value.condition.endTime = 0;
+};
+
+/**
  * 日志等级转tag颜色
  * @param level
  */
@@ -191,6 +232,7 @@ const resetCondition = () => {
     },
   };
   dateRange.value = [];
+  dateMonth.value = "";
   if (isMobile.value) {
     tableCondition.value.page.size = 10;
   }

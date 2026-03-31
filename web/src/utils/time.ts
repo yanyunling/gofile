@@ -40,3 +40,12 @@ export const getWeek = (date: Date) => {
   var week = ["日", "一", "二", "三", "四", "五", "六"];
   return "周" + week[weekNum];
 };
+
+/**
+ * 获取指定时间所在月的最后毫秒数
+ * @param timestamp
+ * @returns
+ */
+export const getMonthLastMilliSecond = (timestamp: number) => {
+  return dayjs(timestamp).endOf("month").valueOf();
+};
