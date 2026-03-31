@@ -191,6 +191,9 @@ const resetCondition = () => {
     },
   };
   dateRange.value = [];
+  if (isMobile.value) {
+    tableCondition.value.page.size = 10;
+  }
   queryTableData();
 };
 </script>
