@@ -79,7 +79,8 @@
     </el-table>
     <el-pagination
       background
-      layout="total, sizes, prev, pager, next, jumper"
+      :size="isMobile ? 'small' : 'default'"
+      :layout="isMobile ? 'prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
       :pageSizes="[10, 20, 50, 100, 200, 500]"
       v-model:pageSize="tableCondition.page.size"
       v-model:currentPage="tableCondition.page.current"
@@ -102,7 +103,9 @@ import { host, context } from "@/config";
 import copy from "copy-to-clipboard";
 import QrcodeVue from "qrcode.vue";
 import qrcode from "@/icons/qrcode.svg";
+import { useIsMobile } from "@/utils/useIsMobile";
 
+const isMobile = useIsMobile();
 const hostUrl = process.env.NODE_ENV === "production" ? location.origin : host;
 const shareUrl = ref(`${hostUrl}${context}/open/file/share/`);
 const tokenStore = useTokenStore();

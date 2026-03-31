@@ -48,7 +48,8 @@
     </el-table>
     <el-pagination
       background
-      layout="total, sizes, prev, pager, next, jumper"
+      :size="isMobile ? 'small' : 'default'"
+      :layout="isMobile ? 'prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
       :pageSizes="[10, 20, 50, 100, 200, 500]"
       v-model:pageSize="tableCondition.page.size"
       v-model:currentPage="tableCondition.page.current"
@@ -68,7 +69,9 @@ import { Search } from "@element-plus/icons-vue";
 import UserApi from "@/api/user";
 import saveDialog from "./save-dialog.vue";
 import resetPasswordDialog from "./reset-password-dialog.vue";
+import { useIsMobile } from "@/utils/useIsMobile";
 
+const isMobile = useIsMobile();
 const tableData: Ref<User[]> = ref([]);
 const tableTotal = ref(0);
 const tableLoading = ref(false);

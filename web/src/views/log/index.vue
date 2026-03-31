@@ -56,8 +56,8 @@
     </el-table>
     <el-pagination
       background
-      layout="total, sizes, prev, pager, next, jumper"
-      :pageSizes="[10, 20, 50, 100, 200, 500]"
+      :size="isMobile ? 'small' : 'default'"
+      :layout="isMobile ? 'prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
       v-model:pageSize="tableCondition.page.size"
       v-model:currentPage="tableCondition.page.current"
       :total="tableTotal"
@@ -75,7 +75,9 @@ import LogApi from "@/api/log";
 import { formatTime } from "@/utils";
 import { useTokenStore } from "@/store/token";
 import { storeToRefs } from "pinia";
+import { useIsMobile } from "@/utils/useIsMobile";
 
+const isMobile = useIsMobile();
 const tokenStore = useTokenStore();
 const { isAdmin } = storeToRefs(tokenStore);
 const tableData: Ref<Log[]> = ref([]);
