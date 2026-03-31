@@ -251,6 +251,9 @@ const deleteClick = (row: Share) => {
   .filter-view {
     width: 100%;
     margin-top: 10px;
+    min-height: 42px;
+    max-height: 84px;
+    overflow: auto;
     .el-form {
       display: flex;
       flex-wrap: wrap;
@@ -264,6 +267,7 @@ const deleteClick = (row: Share) => {
     }
   }
   .table-view {
+    flex: 1;
     .el-scrollbar__wrap {
       display: flex;
     }
