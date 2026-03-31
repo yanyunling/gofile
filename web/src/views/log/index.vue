@@ -54,7 +54,7 @@
         <template #default="scope"> {{ formatTime(scope.row.createTime, "YYYY-MM-DD HH:mm:ss") }} </template>
       </el-table-column>
     </el-table>
-    <log-card-list v-if="isMobile" :log-data="tableData" />
+    <log-card-list v-else :log-data="tableData" />
     <el-pagination
       background
       :size="isMobile ? 'small' : 'default'"
@@ -126,8 +126,11 @@ const queryTableData = () => {
       tableData.value = res.data.records;
       tableTotal.value = res.data.total;
       nextTick(() => {
-        tableRef.value?.setScrollTop(0);
-        document.getElementsByClassName("page-log")[0]?.scrollTo(0, 0);
+        if (!isMobile.value) {
+          tableRef.value?.setScrollTop(0);
+        } else {
+          document.getElementsByClassName("page-log")[0]?.scrollTo(0, 0);
+        }
       });
     })
     .finally(() => {

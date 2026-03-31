@@ -57,7 +57,6 @@ const getLevelType = (level: string) => {
   width: calc(100% - 20px);
   padding: 10px;
   background: #fff;
-
   .log-card {
     background: #fff;
     border-radius: 8px;
@@ -65,7 +64,6 @@ const getLevelType = (level: string) => {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     border: 1px solid #eee;
     overflow: hidden;
-
     .card-header {
       display: flex;
       justify-content: space-between;
@@ -73,14 +71,12 @@ const getLevelType = (level: string) => {
       padding: 12px 15px;
       background: #fafafa;
       border-bottom: 1px solid #eee;
-
       .header-left {
         display: flex;
         align-items: center;
         gap: 10px;
         flex: 1;
         min-width: 0;
-
         .title-text {
           font-size: 14px;
           font-weight: 500;
@@ -90,7 +86,6 @@ const getLevelType = (level: string) => {
           white-space: nowrap;
         }
       }
-
       .time-text {
         font-size: 12px;
         color: #999;
@@ -98,20 +93,16 @@ const getLevelType = (level: string) => {
         margin-left: 10px;
       }
     }
-
     .card-content {
       padding: 12px 15px;
-
       .content-row {
         margin-bottom: 8px;
         display: flex;
         align-items: flex-start;
         gap: 5px;
-
         &:last-child {
           margin-bottom: 0;
         }
-
         .label {
           font-size: 12px;
           color: #666;
@@ -119,7 +110,6 @@ const getLevelType = (level: string) => {
           white-space: nowrap;
           flex-shrink: 0;
         }
-
         .text {
           font-size: 13px;
           color: #333;
@@ -129,7 +119,6 @@ const getLevelType = (level: string) => {
       }
     }
   }
-
   .empty-tip {
     padding: 60px 0;
     text-align: center;
