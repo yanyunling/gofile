@@ -1,5 +1,5 @@
 <template>
-  <div class="page-home" v-loading="loading">
+  <div class="page-home" v-loading="loading" :style="isMobile ? { 'overflow-y': 'auto' } : {}">
     <div class="path-view">
       <el-select v-model="parentDir" placeholder="选择目录" style="width: 100px; margin-right: 10px" @change="changeType(parentDir)">
         <el-option label="公开文件" value="public" />
@@ -13,7 +13,7 @@
         <span class="split-text">/</span>
       </template>
     </div>
-    <el-table class="table-view" ref="tableRef" :data="fileList" height="calc(100% - 49px)" size="small">
+    <el-table v-if="!isMobile" class="table-view" ref="tableRef" :data="fileList" height="calc(100% - 49px)" size="small">
       <el-table-column prop="" label="序号" align="center" width="60">
         <template #default="scope">
           {{ scope.$index + 1 }}
@@ -61,6 +61,18 @@
         </template>
       </el-table-column>
     </el-table>
+    <file-card-list
+      v-else
+      :file-list="fileList"
+      :has-update-auth="updateAuth()"
+      :show-share="!!accessToken"
+      @folder-click="folderClick"
+      @download="downloadClick"
+      @share="shareClick"
+      @delete="deleteClick"
+      @upload="uploadClick"
+      @create-folder="createFolderClick"
+    />
     <el-drawer
       v-model="drawerData.visible"
       :title="drawerData.isUpload ? '文件上传' : '文件下载'"
@@ -105,6 +117,7 @@ import { formatTime, uuid } from "@/utils";
 import { AxiosProgressEvent } from "axios";
 import { host, context } from "@/config";
 import copy from "copy-to-clipboard";
+import FileCardList from "./file-card-list.vue";
 import { useIsMobile } from "@/utils/useIsMobile";
 
 const isMobile = useIsMobile();
