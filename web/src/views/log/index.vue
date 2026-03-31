@@ -1,5 +1,5 @@
 <template>
-  <div class="page-log">
+  <div class="page-log" :style="isMobile ? { 'overflow-y': 'auto' } : {}">
     <div class="filter-view">
       <el-form inline>
         <el-form-item label="级别">
@@ -36,7 +36,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <el-table class="table-view" ref="tableRef" :data="tableData" height="100%" stripe border size="small" v-loading="tableLoading">
+    <el-table v-if="!isMobile" class="table-view" ref="tableRef" :data="tableData" height="100%" stripe border size="small" v-loading="tableLoading">
       <el-table-column prop="" label="序号" align="center" width="60">
         <template #default="scope">
           {{ (tableCondition.page.current - 1) * tableCondition.page.size + scope.$index + 1 }}
@@ -54,6 +54,7 @@
         <template #default="scope"> {{ formatTime(scope.row.createTime, "YYYY-MM-DD HH:mm:ss") }} </template>
       </el-table-column>
     </el-table>
+    <log-card-list v-if="isMobile" :log-data="tableData" />
     <el-pagination
       background
       :size="isMobile ? 'small' : 'default'"
@@ -76,6 +77,7 @@ import { formatTime } from "@/utils";
 import { useTokenStore } from "@/store/token";
 import { storeToRefs } from "pinia";
 import { useIsMobile } from "@/utils/useIsMobile";
+import LogCardList from "./log-card-list.vue";
 
 const isMobile = useIsMobile();
 const tokenStore = useTokenStore();
@@ -101,6 +103,9 @@ const tableRef = ref<InstanceType<typeof ElTable>>();
 const dateRange = ref([]);
 
 onMounted(() => {
+  if (isMobile.value) {
+    tableCondition.value.page.size = 10;
+  }
   queryTableData();
 });
 
@@ -122,6 +127,7 @@ const queryTableData = () => {
       tableTotal.value = res.data.total;
       nextTick(() => {
         tableRef.value?.setScrollTop(0);
+        document.getElementsByClassName("page-log")[0]?.scrollTo(0, 0);
       });
     })
     .finally(() => {
@@ -194,9 +200,6 @@ const resetCondition = () => {
   .filter-view {
     width: 100%;
     margin-top: 10px;
-    min-height: 42px;
-    max-height: 84px;
-    overflow: auto;
     .el-form {
       display: flex;
       flex-wrap: wrap;
@@ -210,7 +213,6 @@ const resetCondition = () => {
     }
   }
   .table-view {
-    flex: 1;
     .el-scrollbar__wrap {
       display: flex;
     }
