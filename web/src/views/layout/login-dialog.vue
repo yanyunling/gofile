@@ -1,8 +1,8 @@
 <template>
-  <el-dialog v-model="loginVisible" append-to-body destroy-on-close width="500" :before-close="beforeClose" center>
+  <el-dialog v-model="loginVisible" append-to-body destroy-on-close :width="isMobile ? 320 : 520" :before-close="beforeClose" center>
     <div class="page-login">
       <div class="title-view">登录</div>
-      <div class="content-view">
+      <div class="content-view" :style="'width: ' + (isMobile ? '240px' : '300px')">
         <form>
           <el-input
             class="input-view"
@@ -55,6 +55,9 @@ import { useCommonStore } from "@/store/common";
 import TokenApi from "@/api/token";
 import { ElMessage } from "element-plus";
 import { storeToRefs } from "pinia";
+import { useIsMobile } from "@/utils/useIsMobile";
+
+const isMobile = useIsMobile(520);
 
 const tokenStore = useTokenStore();
 const commonStore = useCommonStore();

@@ -4,7 +4,7 @@
     title="更新密码"
     append-to-body
     destroy-on-close
-    width="400"
+    :width="isMobile ? 320 : 400"
     :before-close="beforeClose"
     center
   >
@@ -31,7 +31,9 @@ import { ref } from "vue";
 import { ElMessage } from "element-plus";
 import type { FormInstance } from "element-plus";
 import UserApi from "@/api/user";
+import { useIsMobile } from "@/utils/useIsMobile";
 
+const isMobile = useIsMobile(520);
 const emit = defineEmits<{ "update:visible": [visible: boolean] }>();
 
 const props = defineProps({

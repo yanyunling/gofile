@@ -4,7 +4,7 @@
     :title="formData.id ? '修改用户信息' : '新增用户信息'"
     append-to-body
     destroy-on-close
-    width="500"
+    :width="isMobile ? 320 : 500"
     :before-close="beforeClose"
     center
   >
@@ -52,7 +52,9 @@ import { ref, Ref, watch, PropType } from "vue";
 import { ElMessage } from "element-plus";
 import type { FormInstance } from "element-plus";
 import UserApi from "@/api/user";
+import { useIsMobile } from "@/utils/useIsMobile";
 
+const isMobile = useIsMobile(520);
 const emit = defineEmits<{ save: []; "update:visible": [visible: boolean] }>();
 
 const props = defineProps({

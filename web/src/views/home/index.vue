@@ -67,6 +67,8 @@
       direction="ltr"
       :close-on-press-escape="false"
       :close-on-click-modal="drawerData.isFinished"
+      :size="isMobile ? '85%' : '35%'"
+      body-class="drawer-body"
     >
       <el-descriptions direction="vertical" :column="1" border>
         <el-descriptions-item label="文件名">{{ drawerData.fileName }}</el-descriptions-item>
@@ -103,7 +105,9 @@ import { formatTime, uuid } from "@/utils";
 import { AxiosProgressEvent } from "axios";
 import { host, context } from "@/config";
 import copy from "copy-to-clipboard";
+import { useIsMobile } from "@/utils/useIsMobile";
 
+const isMobile = useIsMobile();
 const hostUrl = process.env.NODE_ENV === "production" ? location.origin : host;
 const shareUrl = ref(`${hostUrl}${context}/open/file/share/`);
 const tokenStore = useTokenStore();
@@ -419,7 +423,7 @@ const deleteClick = (row: FileInfo) => {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .page-home {
   width: 100%;
   background: #fff;
@@ -456,6 +460,11 @@ const deleteClick = (row: FileInfo) => {
     }
     .el-scrollbar__wrap {
       display: flex;
+    }
+  }
+  .drawer-body {
+    td {
+      word-break: break-all;
     }
   }
 }

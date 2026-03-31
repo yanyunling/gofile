@@ -1,5 +1,13 @@
 <template>
-  <el-dialog :model-value="props.visible" title="重置密码" append-to-body destroy-on-close width="400" :before-close="beforeClose" center>
+  <el-dialog
+    :model-value="props.visible"
+    title="重置密码"
+    append-to-body
+    destroy-on-close
+    :width="isMobile ? 320 : 400"
+    :before-close="beforeClose"
+    center
+  >
     <el-form :model="formData" label-width="auto" :rules="rules" ref="formRef">
       <el-form-item label="用户名" prop="username">
         <el-input v-model="formData.username" readonly></el-input>
@@ -20,7 +28,9 @@ import { ref, Ref, watch, PropType } from "vue";
 import { ElMessage } from "element-plus";
 import type { FormInstance } from "element-plus";
 import UserApi from "@/api/user";
+import { useIsMobile } from "@/utils/useIsMobile";
 
+const isMobile = useIsMobile(520);
 const emit = defineEmits<{ "update:visible": [visible: boolean] }>();
 
 const props = defineProps({
