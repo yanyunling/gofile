@@ -21,6 +21,7 @@
         </el-form-item>
         <el-form-item label="时间">
           <el-date-picker
+            style="width: 240px"
             v-model="dateRange"
             type="daterange"
             value-format="x"
