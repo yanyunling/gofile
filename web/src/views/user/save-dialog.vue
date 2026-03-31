@@ -10,10 +10,10 @@
   >
     <el-form :model="formData" label-width="auto" :rules="rules" ref="formRef">
       <el-form-item label="用户名" prop="username">
-        <el-input v-model.trim="formData.username" placeholder="请填写用户名" :readonly="formData.id !== ''"></el-input>
+        <el-input v-model.trim="formData.username" placeholder="请填写用户名" autocomplete="off" :readonly="formData.id !== ''"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="password" v-if="!formData.id">
-        <el-input v-model.trim="formData.password" placeholder="请填写密码"></el-input>
+        <el-input v-model.trim="formData.password" type="password" placeholder="请填写密码" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item label="状态" prop="enable">
         <el-radio-group v-model="formData.enable">

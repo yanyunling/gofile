@@ -82,9 +82,9 @@ const handleCardClick = (item: FileInfo) => {
 
 <style lang="scss" scoped>
 .file-card-list {
+  width: calc(100% - 20px);
   padding: 10px;
   background: #fff;
-
   .action-bar {
     display: flex;
     justify-content: center;
@@ -92,7 +92,6 @@ const handleCardClick = (item: FileInfo) => {
     margin-bottom: 15px;
     padding-bottom: 15px;
     border-bottom: 1px solid #eee;
-
     .el-button {
       flex: 1;
       max-width: 140px;
@@ -102,7 +101,6 @@ const handleCardClick = (item: FileInfo) => {
       gap: 5px;
     }
   }
-
   .file-card {
     background: #fff;
     border-radius: 8px;
@@ -111,28 +109,23 @@ const handleCardClick = (item: FileInfo) => {
     border: 1px solid #eee;
     overflow: hidden;
     transition: all 0.3s;
-
     &:active {
       background: #f5f5f5;
     }
-
     .card-header {
       display: flex;
       align-items: center;
       padding: 12px 15px;
       gap: 12px;
       cursor: pointer;
-
       .file-icon {
         font-size: 28px;
         color: #3d5eb9;
         flex-shrink: 0;
       }
-
       .file-info {
         flex: 1;
         min-width: 0;
-
         .file-name {
           font-size: 15px;
           font-weight: 500;
@@ -142,7 +135,6 @@ const handleCardClick = (item: FileInfo) => {
           text-overflow: ellipsis;
           white-space: nowrap;
         }
-
         .file-meta {
           font-size: 12px;
           color: #999;
@@ -151,14 +143,12 @@ const handleCardClick = (item: FileInfo) => {
           gap: 5px;
         }
       }
-
       .arrow-icon {
         font-size: 18px;
         color: #ccc;
         flex-shrink: 0;
       }
     }
-
     .card-footer {
       display: flex;
       justify-content: space-between;
@@ -166,16 +156,13 @@ const handleCardClick = (item: FileInfo) => {
       padding: 10px 15px;
       background: #fafafa;
       border-top: 1px solid #eee;
-
       .time-text {
         font-size: 12px;
         color: #999;
       }
-
       .action-buttons {
         display: flex;
         gap: 8px;
-
         .el-button {
           padding: 5px 10px;
           font-size: 12px;
@@ -183,7 +170,6 @@ const handleCardClick = (item: FileInfo) => {
       }
     }
   }
-
   .empty-tip {
     padding: 60px 0;
     text-align: center;

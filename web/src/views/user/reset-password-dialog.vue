@@ -13,7 +13,7 @@
         <el-input v-model="formData.username" readonly></el-input>
       </el-form-item>
       <el-form-item label="新密码" prop="password">
-        <el-input v-model.trim="formData.password" placeholder="请填写新密码"></el-input>
+        <el-input v-model.trim="formData.password" type="password" placeholder="请填写新密码"></el-input>
       </el-form-item>
     </el-form>
     <template #footer>

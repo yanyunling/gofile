@@ -1,10 +1,10 @@
 <template>
-  <div class="page-user">
+  <div class="page-user" :style="isMobile ? { 'overflow-y': 'auto' } : {}">
     <div class="filter-view">
       <el-input class="filter-input" v-model="tableCondition.condition" placeholder="全局搜索" clearable></el-input>
       <el-button type="primary" :icon="Search" @click="tablePageCurrentChange(1)" :loading="tableLoading">查询</el-button>
     </div>
-    <el-table class="table-view" ref="tableRef" :data="tableData" height="100%" stripe border size="small" v-loading="tableLoading">
+    <el-table v-if="!isMobile" class="table-view" ref="tableRef" :data="tableData" height="100%" stripe border size="small" v-loading="tableLoading">
       <el-table-column prop="" label="序号" align="center" width="60">
         <template #default="scope">
           {{ (tableCondition.page.current - 1) * tableCondition.page.size + scope.$index + 1 }}
@@ -46,6 +46,7 @@
         </template>
       </el-table-column>
     </el-table>
+    <user-card-list v-else :user-data="tableData" @edit="editClick" @reset-password="resetPasswordClick" @delete="deleteClick" @add="addClick" />
     <el-pagination
       background
       :size="isMobile ? 'small' : 'default'"
@@ -70,6 +71,7 @@ import UserApi from "@/api/user";
 import saveDialog from "./save-dialog.vue";
 import resetPasswordDialog from "./reset-password-dialog.vue";
 import { useIsMobile } from "@/utils/useIsMobile";
+import UserCardList from "./user-card-list.vue";
 
 const isMobile = useIsMobile();
 const tableData: Ref<User[]> = ref([]);
@@ -88,6 +90,9 @@ const resetPasswordDialogVisible = ref(false);
 const dialogFormData: Ref<User> = ref();
 
 onMounted(() => {
+  if (isMobile.value) {
+    tableCondition.value.page.size = 10;
+  }
   queryTableData();
 });
 
@@ -101,7 +106,11 @@ const queryTableData = () => {
       tableData.value = res.data.records;
       tableTotal.value = res.data.total;
       nextTick(() => {
-        tableRef.value?.setScrollTop(0);
+        if (!isMobile.value) {
+          tableRef.value?.setScrollTop(0);
+        } else {
+          document.getElementsByClassName("page-user")[0]?.scrollTo(0, 0);
+        }
       });
     })
     .finally(() => {
