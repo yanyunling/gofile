@@ -21,7 +21,7 @@
           </el-tag>
         </div>
         <div class="permission-row">
-          <span class="label">保护文件：</span>
+          <span class="label">受保护文件：</span>
           <el-tag :type="item.protectedAuth === 1 ? 'success' : 'info'" size="small" disable-transitions>
             {{ item.protectedAuth === 1 ? "有权限" : "无权限" }}
           </el-tag>

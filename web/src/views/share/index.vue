@@ -107,7 +107,7 @@
 
 <script lang="ts" setup>
 import { ref, Ref, onMounted, nextTick } from "vue";
-import { ElTable, ElMessage, ElMessageBox } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { Search } from "@element-plus/icons-vue";
 import ShareApi from "@/api/share";
 import { formatTime } from "@/utils";
@@ -145,7 +145,7 @@ const tableCondition: Ref<PageCondition<Share>> = ref({
     endTime: 0,
   },
 });
-const tableRef = ref<InstanceType<typeof ElTable>>();
+const tableRef = ref();
 const dateRange = ref([]);
 const dateMonth = ref("");
 

@@ -20,7 +20,7 @@ func FileListPublic(ctx iris.Context) {
 	ctx.JSON(common.NewSuccessData("查询成功", result))
 }
 
-// 查询保护文件列表
+// 查询受保护文件列表
 func FileListProtected(ctx iris.Context) {
 	fileInfo := entity.FileInfo{}
 	resolveParam(ctx, &fileInfo)
@@ -57,7 +57,7 @@ func FileDownloadPublic(ctx iris.Context) {
 	service.FileDownload(ctx, common.PublicDirName, fileInfo.Path, fileInfo.Name, " ")
 }
 
-// 下载保护文件
+// 下载受保护文件
 func FileDownloadProtected(ctx iris.Context) {
 	fileInfo := entity.FileInfo{}
 	resolveParam(ctx, &fileInfo)
@@ -94,7 +94,7 @@ func FileSharePublic(ctx iris.Context) {
 	ctx.JSON(common.NewSuccessData("已创建分享链接", id))
 }
 
-// 分享保护文件
+// 分享受保护文件
 func FileShareProtected(ctx iris.Context) {
 	share := entity.Share{}
 	resolveParam(ctx, &share)
@@ -191,7 +191,7 @@ func FileUploadPublic(ctx iris.Context) {
 	ctx.JSON(common.NewSuccess("上传成功"))
 }
 
-// 上传保护文件
+// 上传受保护文件
 func FileUploadProtected(ctx iris.Context) {
 	// 判断用户是否有更新权限
 	tokenCache := middleware.CurrentUserCache(ctx)
@@ -237,7 +237,7 @@ func FileDeletePublic(ctx iris.Context) {
 	ctx.JSON(common.NewSuccess("删除成功"))
 }
 
-// 删除保护文件
+// 删除受保护文件
 func FileDeleteProtected(ctx iris.Context) {
 	fileInfo := entity.FileInfo{}
 	resolveParam(ctx, &fileInfo)

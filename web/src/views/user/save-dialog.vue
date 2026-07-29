@@ -27,7 +27,7 @@
           <el-radio :value="0" border>无</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="保护文件权限" prop="protectedAuth">
+      <el-form-item label="受保护文件权限" prop="protectedAuth">
         <el-radio-group v-model="formData.protectedAuth">
           <el-radio :value="1" border>有</el-radio>
           <el-radio :value="0" border>无</el-radio>

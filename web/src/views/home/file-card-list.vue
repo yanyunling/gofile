@@ -1,7 +1,8 @@
 <template>
   <div class="file-card-list">
     <div v-if="hasUpdateAuth" class="action-bar">
-      <el-button type="primary" @click="$emit('upload')">上传</el-button>
+      <el-button type="primary" @click="$emit('upload', false)">上传文件</el-button>
+      <el-button type="primary" @click="$emit('upload', true)">上传目录</el-button>
       <el-button type="primary" @click="$emit('create-folder')">创建目录</el-button>
     </div>
     <div v-for="(item, index) in fileList" :key="index" class="file-card">
@@ -61,7 +62,7 @@ const emit = defineEmits<{
   (e: "download", row: FileInfo): void;
   (e: "share", row: FileInfo): void;
   (e: "delete", row: FileInfo): void;
-  (e: "upload"): void;
+  (e: "upload", isDir: boolean): void;
   (e: "create-folder"): void;
 }>();
 

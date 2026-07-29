@@ -23,7 +23,7 @@
           <el-tag v-else type="danger" disable-transitions>无</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="protectedAuth" label="保护文件权限" align="center">
+      <el-table-column prop="protectedAuth" label="受保护文件权限" align="center">
         <template #default="scope">
           <el-tag v-if="scope.row.protectedAuth === 1" type="success" disable-transitions>有</el-tag>
           <el-tag v-else type="danger" disable-transitions>无</el-tag>
@@ -65,7 +65,7 @@
 
 <script lang="ts" setup>
 import { ref, Ref, onMounted, nextTick } from "vue";
-import { ElMessage, ElMessageBox, ElTable } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { Search } from "@element-plus/icons-vue";
 import UserApi from "@/api/user";
 import saveDialog from "./save-dialog.vue";
@@ -84,7 +84,7 @@ const tableCondition: Ref<PageCondition<string>> = ref({
   },
   condition: "",
 });
-const tableRef = ref<InstanceType<typeof ElTable>>();
+const tableRef = ref();
 const dialogVisible = ref(false);
 const resetPasswordDialogVisible = ref(false);
 const dialogFormData: Ref<User> = ref();

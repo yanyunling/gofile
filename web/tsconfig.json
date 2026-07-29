@@ -3,7 +3,7 @@
     "target": "esnext",
     "useDefineForClassFields": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "strict": false,
     "noImplicitAny": false,
     "jsx": "preserve",
@@ -20,10 +20,9 @@
       "vite/client",
       "node"
     ],
-    "baseUrl": "./",
     "paths": {
       "@/*": [
-        "src/*"
+        "./src/*"
       ]
     }
   },

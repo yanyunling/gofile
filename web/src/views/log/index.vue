@@ -83,7 +83,6 @@
 
 <script lang="ts" setup>
 import { ref, Ref, onMounted, nextTick } from "vue";
-import { ElTable } from "element-plus";
 import { Search } from "@element-plus/icons-vue";
 import LogApi from "@/api/log";
 import { formatTime } from "@/utils";
@@ -113,7 +112,7 @@ const tableCondition: Ref<PageCondition<LogCondition>> = ref({
     endTime: 0,
   },
 });
-const tableRef = ref<InstanceType<typeof ElTable>>();
+const tableRef = ref();
 const dateRange = ref([]);
 const dateMonth = ref("");
 

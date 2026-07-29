@@ -1,10 +1,10 @@
 <template>
   <div class="page-home" v-loading="loading" :style="isMobile ? { 'overflow-y': 'auto' } : {}">
     <div class="path-view">
-      <el-select v-model="parentDir" placeholder="选择目录" style="width: 100px; margin-right: 10px" @change="changeType(parentDir)">
+      <el-select v-model="parentDir" placeholder="选择目录" style="width: 120px; margin-right: 10px" @change="changeType(parentDir)">
         <el-option label="公开文件" value="public" />
-        <el-option v-if="accessToken" label="保护文件" value="protected" />
-        <el-option v-if="accessToken" label="个人文件" value="private" />
+        <el-option v-if="accessToken" label="受保护文件" value="protected" />
+        <el-option v-if="accessToken" label="私有文件" value="private" />
       </el-select>
       <span class="path-text" :class="{ active: pathList.length === 0 }" @click="pathClick(-1)">根目录</span>
       <span class="split-text">/</span>
@@ -46,16 +46,17 @@
           {{ formatTime(scope.row.updateTime) }}
         </template>
       </el-table-column>
-      <el-table-column prop="操作" label="" align="center" width="180">
+      <el-table-column prop="操作" label="" align="center" width="210">
         <template #header>
           <template v-if="updateAuth()">
-            <el-button type="primary" link size="small" @click="uploadClick">上传</el-button>
+            <el-button type="primary" link size="small" @click="uploadClick(false)">上传文件</el-button>
+            <el-button type="primary" link size="small" @click="uploadClick(true)">上传目录</el-button>
             <el-button type="primary" link size="small" @click="createFolderClick">创建目录</el-button>
           </template>
           <template v-else>操作</template>
         </template>
         <template #default="scope">
-          <el-button v-if="!scope.row.isDir" type="primary" link size="small" @click="downloadClick(scope.row)">下载</el-button>
+          <el-button type="primary" link size="small" @click="downloadClick(scope.row)">下载</el-button>
           <el-button v-if="!scope.row.isDir && accessToken" type="success" link size="small" @click="shareClick(scope.row)">分享</el-button>
           <el-button v-if="updateAuth()" type="danger" link size="small" @click="deleteClick(scope.row)">删除</el-button>
         </template>
@@ -272,20 +273,42 @@ const copyLinkClick = (id: string) => {
 
 /**
  * 上传文件
+ * @param isDir 是否为目录
  */
-const uploadClick = () => {
-  Upload.openFiles(true)
+const uploadClick = (isDir: boolean) => {
+  Upload.openFiles(true, undefined, isDir)
     .then(async (files) => {
+      // 创建目录
+      if (isDir) {
+        let dirList = [];
+        for (let i = 0; i < files.length; i++) {
+          let dir = Upload.getDirectoryPath(files[i]);
+          if (!dirList.includes(dir)) {
+            dirList.push(dir);
+          }
+        }
+        for (let dir of dirList) {
+          try {
+            await FileApi.folder(parentDir.value, pathList.value.join("/"), dir);
+          } catch (e) {
+            return;
+          }
+        }
+      }
+
+      // 上传文件
       out: for (let i = 0; i < files.length; i++) {
         // 前端提前校验文件大小与重名
         if (files[i].size >= 1024 * 1024 * 1024) {
           ElMessage.error(`${files[i].name} 文件大小超过1GB，上传失败`);
           continue;
         }
-        for (let row of fileList.value) {
-          if (row.name === files[i].name) {
-            ElMessage.error(`${files[i].name} 文件已存在，上传失败`);
-            continue out;
+        if (!isDir) {
+          for (let row of fileList.value) {
+            if (row.name === files[i].name) {
+              ElMessage.error(`${files[i].name} 文件已存在，上传失败`);
+              continue out;
+            }
           }
         }
 
@@ -293,7 +316,11 @@ const uploadClick = () => {
         const id = uuid();
         openDrawer(id);
         try {
-          await FileApi.upload(parentDir.value, pathList.value.join("/"), files[i], onProgress, id, drawerData.value.abortController);
+          let path = pathList.value.join("/");
+          if (isDir) {
+            path = path + "/" + Upload.getDirectoryPath(files[i]);
+          }
+          await FileApi.upload(parentDir.value, path, files[i], onProgress, id, drawerData.value.abortController);
           ElMessage.success(`${files[i].name} 上传成功`);
           if (id === drawerData.value.id) {
             drawerData.value.isFinished = true;

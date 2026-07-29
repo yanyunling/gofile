@@ -19,9 +19,10 @@ export class Upload {
    * 上传文件
    * @param multiple 多选
    * @param accept 支持类型
+   * @param isDirectory 是否选择文件夹
    * @returns
    */
-  static openFiles(multiple?: boolean, accept?: string) {
+  static openFiles(multiple?: boolean, accept?: string, isDirectory?: boolean) {
     return new Promise<FileList>((resolve, reject) => {
       const input = document.createElement("input");
       input.type = "file";
@@ -30,6 +31,9 @@ export class Upload {
       }
       if (multiple) {
         input.multiple = true;
+      }
+      if (isDirectory) {
+        input.setAttribute("webkitdirectory", "");
       }
       input.onchange = (e: Event) => {
         let event = e as HTMLInputEvent;
@@ -41,6 +45,23 @@ export class Upload {
       };
       input.click();
     });
+  }
+
+  /**
+   * 从 File 对象中提取纯目录路径
+   * @param file 包含 webkitRelativePath 的 File 对象
+   * @returns 目录路径字符串，如果文件在根目录则返回空字符串
+   */
+  static getDirectoryPath(file: File): string {
+    const relativePath = file.webkitRelativePath;
+    if (!relativePath) {
+      return ""
+    }
+    const lastSlashIndex = relativePath.lastIndexOf("/");
+    if (lastSlashIndex === -1) {
+      return "";
+    }
+    return relativePath.substring(0, lastSlashIndex);
   }
 
   /**
