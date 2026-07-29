@@ -57,7 +57,7 @@
         </template>
         <template #default="scope">
           <el-button type="primary" link size="small" @click="downloadClick(scope.row)">下载</el-button>
-          <el-button v-if="!scope.row.isDir && accessToken" type="success" link size="small" @click="shareClick(scope.row)">分享</el-button>
+          <el-button v-if="accessToken" type="success" link size="small" @click="shareClick(scope.row)">分享</el-button>
           <el-button v-if="updateAuth()" type="danger" link size="small" @click="deleteClick(scope.row)">删除</el-button>
         </template>
       </el-table-column>

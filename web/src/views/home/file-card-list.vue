@@ -24,7 +24,7 @@
         <div class="time-text">{{ formatTime(item.updateTime) }}</div>
         <div class="action-buttons">
           <el-button type="primary" size="small" @click="$emit('download', item)"> 下载 </el-button>
-          <el-button v-if="!item.isDir && showShare" type="success" size="small" @click="$emit('share', item)"> 分享 </el-button>
+          <el-button v-if="showShare" type="success" size="small" @click="$emit('share', item)"> 分享 </el-button>
           <el-button v-if="hasUpdateAuth" type="danger" size="small" @click="$emit('delete', item)"> 删除 </el-button>
         </div>
       </div>

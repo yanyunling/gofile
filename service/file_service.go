@@ -169,18 +169,8 @@ func FileDownload(ctx iris.Context, parentDir, path, fileName, username string) 
 
 // 分享文件
 func FileShare(share entity.Share, username string) string {
-	// 判断是目录还是文件
 	path := filepath.Clean("/" + share.Path)
 	fileName := filepath.Clean("/" + share.Name)
-	filePath := filepath.Join(common.DataPath, share.ParentDir, path, fileName)
-	isDir, err := util.PathIsDir(filePath)
-	if err != nil {
-		panic(common.NewErr("文件不存在", err))
-	}
-	if isDir {
-		// 目录
-		panic(common.NewError("暂不支持分享目录"))
-	}
 
 	// 保存分享信息
 	share.Username = username
@@ -216,7 +206,7 @@ func FileFolder(parentDir, path, fileName, username string) {
 	}
 
 	// 创建目录
-	err = os.Mkdir(filePath, 0755)
+	err = os.MkdirAll(filePath, 0755)
 	if err != nil {
 		panic(common.NewErr("目录创建失败："+innerPath, err))
 	}
@@ -238,13 +228,17 @@ func FileUpload(ctx iris.Context, parentDir, username string) {
 	path := ctx.FormValue("path")
 	path = filepath.Clean("/" + path)
 	file, fileHeader, err := ctx.FormFile("file")
+	uploadName := filepath.Base(fileHeader.Filename)
+	if uploadName == "" || uploadName == "." {
+		panic(common.NewErr("上传失败，非法的文件名", nil))
+	}
 	if err != nil {
 		panic(common.NewErr("上传失败", err))
 	}
 	defer file.Close()
 
 	// 判断文件是否存在
-	filePath := filepath.Join(common.DataPath, parentDir, path, fileHeader.Filename)
+	filePath := filepath.Join(common.DataPath, parentDir, path, uploadName)
 	_, err = util.PathIsDir(filePath)
 	if err == nil {
 		panic(common.NewErr("文件已存在", err))
@@ -260,12 +254,13 @@ func FileUpload(ctx iris.Context, parentDir, username string) {
 	// 复制文件
 	_, err = io.Copy(out, file)
 	if err != nil {
+		out.Close()
 		os.RemoveAll(filePath)
 		panic(common.NewErr("文件保存失败", err))
 	}
 
 	// 添加日志
-	logFilePath := filepath.Join(parentDir, path, fileHeader.Filename)
+	logFilePath := filepath.Join(parentDir, path, uploadName)
 	content := "用时：" + strconv.FormatFloat(time.Since(start).Seconds(), 'f', 2, 64) + "秒，路径：" + logFilePath
 	LogAdd(entity.Info, "上传文件", content, username)
 }
