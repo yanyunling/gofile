@@ -13,7 +13,7 @@
         <span class="split-text">/</span>
       </template>
     </div>
-    <el-table v-if="!isMobile" class="table-view" ref="tableRef" :data="fileList" height="calc(100% - 49px)" size="small">
+    <el-table v-if="!isMobile" class="table-view" ref="tableRef" :data="fileList" height="calc(100% - 59px)" size="small">
       <el-table-column prop="" label="序号" align="center" width="60">
         <template #default="scope">
           {{ scope.$index + 1 }}
@@ -291,6 +291,7 @@ const uploadClick = (isDir: boolean) => {
           try {
             await FileApi.folder(parentDir.value, pathList.value.join("/"), dir);
           } catch (e) {
+            queryFileList();
             return;
           }
         }
@@ -299,8 +300,8 @@ const uploadClick = (isDir: boolean) => {
       // 上传文件
       out: for (let i = 0; i < files.length; i++) {
         // 前端提前校验文件大小与重名
-        if (files[i].size >= 1024 * 1024 * 1024) {
-          ElMessage.error(`${files[i].name} 文件大小超过1GB，上传失败`);
+        if (files[i].size >= 3 * 1024 * 1024 * 1024) {
+          ElMessage.error(`${files[i].name} 文件大小超过3GB，上传失败`);
           continue;
         }
         if (!isDir) {
@@ -314,14 +315,23 @@ const uploadClick = (isDir: boolean) => {
 
         // 循环上传
         const id = uuid();
-        openDrawer(id);
+        openDrawer(id, true);
         try {
           let path = pathList.value.join("/");
           if (isDir) {
-            path = path + "/" + Upload.getDirectoryPath(files[i]);
+            if (path) {
+              path += "/" + Upload.getDirectoryPath(files[i]);
+            } else {
+              path = Upload.getDirectoryPath(files[i]);
+            }
           }
           await FileApi.upload(parentDir.value, path, files[i], onProgress, id, drawerData.value.abortController);
-          ElMessage.success(`${files[i].name} 上传成功`);
+          ElNotification({
+            type: "success",
+            title: "文件上传成功",
+            duration: 5000,
+            message: path ? path + "/" + files[i].name : files[i].name,
+          });
           if (id === drawerData.value.id) {
             drawerData.value.isFinished = true;
             drawerData.value.finished = "成功";
@@ -344,7 +354,7 @@ const uploadClick = (isDir: boolean) => {
 const downloadClick = (row: FileInfo) => {
   const fileName = row.name;
   const id = uuid();
-  openDrawer(id);
+  openDrawer(id, false);
   FileApi.download(parentDir.value, pathList.value.join("/"), fileName, onProgress, id, drawerData.value.abortController)
     .then((res) => {
       saveAs(res, fileName);
@@ -392,12 +402,13 @@ const onProgress = (progressEvent: AxiosProgressEvent, fileName: string, isUploa
 /**
  * 打开进度抽屉
  * @param id
+ * @param isUpload
  */
-const openDrawer = (id: string) => {
+const openDrawer = (id: string, isUpload: boolean) => {
   drawerData.value.id = id;
   drawerData.value.isFinished = false;
   drawerData.value.finished = "进行中";
-  drawerData.value.isUpload = false;
+  drawerData.value.isUpload = isUpload;
   drawerData.value.fileName = "--";
   drawerData.value.loaded = "--";
   drawerData.value.total = "--";
@@ -468,9 +479,11 @@ const deleteClick = (row: FileInfo) => {
   width: 100%;
   background: #fff;
   .path-view {
-    height: 50px;
+    height: 60px;
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    overflow-y: auto;
     font-size: 14px;
     color: #3d5eb9;
     background: #fff;

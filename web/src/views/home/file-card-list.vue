@@ -132,9 +132,6 @@ const handleCardClick = (item: FileInfo) => {
           font-weight: 500;
           color: #333;
           margin-bottom: 4px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
         }
         .file-meta {
           font-size: 12px;

@@ -59,7 +59,7 @@ class FileApi {
       signal: abortController.signal,
       data: { path: path, name: name },
       onDownloadProgress: (progressEvent) => {
-        onProgress(progressEvent, name, false, id);
+        onProgress(progressEvent, path ? path + "/" + name : name, false, id);
       },
     });
   }
@@ -85,7 +85,7 @@ class FileApi {
       signal: abortController.signal,
       data: formData,
       onUploadProgress(progressEvent) {
-        onProgress(progressEvent, file.name, true, id);
+        onProgress(progressEvent, path ? path + "/" + file.name : file.name, true, id);
       },
     });
   }

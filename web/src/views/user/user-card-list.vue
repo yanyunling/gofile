@@ -144,7 +144,7 @@ const emit = defineEmits<{
           font-size: 13px;
           color: #666;
           font-weight: 500;
-          width: 70px;
+          width: 80px;
           flex-shrink: 0;
         }
         .el-tag {

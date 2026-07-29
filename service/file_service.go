@@ -221,8 +221,8 @@ func FileFolder(parentDir, path, fileName, username string) {
 func FileUpload(ctx iris.Context, parentDir, username string) {
 	start := time.Now()
 
-	// 设置最大上传大小1GB
-	ctx.SetMaxRequestBodySize(iris.GB)
+	// 设置最大上传大小3GB
+	ctx.SetMaxRequestBodySize(3 * iris.GB)
 
 	// 获取文件
 	path := ctx.FormValue("path")
