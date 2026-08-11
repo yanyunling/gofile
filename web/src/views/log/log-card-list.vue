@@ -104,11 +104,12 @@ const getLevelType = (level: string) => {
           margin-bottom: 0;
         }
         .label {
-          font-size: 12px;
+          font-size: 13px;
           color: #666;
           font-weight: 500;
           white-space: nowrap;
           flex-shrink: 0;
+          line-height: 1.6;
         }
         .text {
           font-size: 13px;
