@@ -43,7 +43,7 @@ func Captcha(ctx iris.Context) {
 func CaptchaValidate(ctx iris.Context) {
 	signIn := common.SignIn{}
 	resolveParam(ctx, &signIn)
-	ok := service.CaptchaValidate(signIn)
+	ok := service.CaptchaValidate(signIn, true)
 	if ok {
 		ctx.JSON(common.NewSuccessData("验证码校验成功", true))
 	} else {
